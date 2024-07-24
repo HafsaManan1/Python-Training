@@ -134,3 +134,25 @@ for fruit in fruits:
   if fruit=="banana":
     break
   print(fruit)
+#%%
+#multiplication Table
+x=10
+for i in range(1,11):
+  print(f"{x}x{i}={x*i}")
+
+# %%
+#looping through dictionaries
+thisdict = {
+  "brand": "Ford",
+  "model": "Mustang",
+  "year": 1964
+}
+for i in thisdict:
+  print(i,":",thisdict[i])
+#%%
+#find and print the first even number from a list
+x=[1, 3, 5, 7, 8, 9, 10]
+for i in x:
+  if i%2==0:
+    print(i)
+    break
