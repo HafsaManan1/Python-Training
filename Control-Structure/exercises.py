@@ -30,6 +30,31 @@ if (x % 4 == 0 and x % 100 != 0) or (x % 400 == 0):
 else:
   print("year is not leap")
 #%%
+#code to check if a number is divisible by both 2 and three
+x=int(input("Please enter a year"))
+if x%2==0 and x%3==0:
+  print("The number is divisible by both 2 and 3")
+else:
+  print("The number is not divisible by 2 and 3")
+#%%
+#Ternary operators
+x=int(input("Please enter a year"))
+print("x is postive") if x>0 else print("x is negative") 
+#%%
+#check if a list is empty or not
+x=[]
+if x:
+  print("list is not empty")
+else:
+  print("list is empty")
+#%%
+#string comparison
+str="hello"
+x=input("Enter a string")
+x=x.lower()
+if x==str:
+  print("The text matches")
+#%%
                         #---while loops---
 i=1
 while i<6:
