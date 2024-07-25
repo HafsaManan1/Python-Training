@@ -1,6 +1,5 @@
 from operations import addition, subtraction, multiplication, division
-opt=0
-while opt!=5:
+while True:
     print("""\nOPTIONS:
         1-ADDITION
         2-SUBTRACTION
