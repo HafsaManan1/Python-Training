@@ -23,8 +23,8 @@ class InventoryManager:
     def __init__(self, database):
         self.db = database
 
-    def add_item(self, name, quantity, price):
-        self.db.execute('INSERT INTO inventory (name, quantity, price) VALUES (?, ?, ?)', (name, quantity, price))
+    def add_item(self,item_id, name, quantity, price):
+        self.db.execute('INSERT INTO inventory (id, name, quantity, price) VALUES (?, ?, ?, ?)', (item_id, name, quantity, price))
 
     def update_item(self, item_id, name, quantity, price):
         self.db.execute('UPDATE inventory SET name=?, quantity=?, price=? WHERE id=?', (name, quantity, price, item_id))
@@ -34,3 +34,7 @@ class InventoryManager:
 
     def get_all_items(self):
         return self.db.fetchall('SELECT * FROM inventory')
+    
+    def get_item(self,item_id):
+        return self.db.fetchone('SELECT * FROM inventory WHERE id=?',(item_id,))
+

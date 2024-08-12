@@ -16,7 +16,7 @@ class Database:
         ''')
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS inventory (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY ,
                 name TEXT UNIQUE NOT NULL,
                 quantity INTEGER NOT NULL,
                 price REAL NOT NULL

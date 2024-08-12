@@ -1,6 +1,6 @@
 import sqlite3
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import StringVar, ttk, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -63,32 +63,43 @@ class InventoryApp:
 
         tk.Label(self.inventory_frame, text="INVENTORY MANAGEMENT", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").grid(row=0,columnspan=8,pady=5)
 
-        tk.Label(self.inventory_frame, text="Name",bg="#347083",fg="#FFFFFF").grid(row=1, column=0)
+        tk.Label(self.inventory_frame, text="Sku",bg="#347083",fg="#FFFFFF").grid(row=1, column=0)
+        self.entry_item_sku = tk.Entry(self.inventory_frame)
+        self.entry_item_sku.grid(row=1, column=1)
+        
+        tk.Label(self.inventory_frame, text="Name",bg="#347083",fg="#FFFFFF").grid(row=1, column=2)
         self.entry_item_name = tk.Entry(self.inventory_frame)
-        self.entry_item_name.grid(row=1, column=1)
+        self.entry_item_name.grid(row=1, column=3)
 
-        tk.Label(self.inventory_frame, text="Quantity",bg="#347083",fg="#FFFFFF").grid(row=1, column=2)
+        tk.Label(self.inventory_frame, text="Quantity",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
         self.entry_quantity = tk.Entry(self.inventory_frame)
-        self.entry_quantity.grid(row=1, column=3)
+        self.entry_quantity.grid(row=1, column=5)
 
-        tk.Label(self.inventory_frame, text="Price",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
+        tk.Label(self.inventory_frame, text="Price",bg="#347083",fg="#FFFFFF").grid(row=1, column=6)
         self.entry_price = tk.Entry(self.inventory_frame)
-        self.entry_price.grid(row=1, column=5)
+        self.entry_price.grid(row=1, column=7)
+
+        tk.Label(self.inventory_frame, text="Search",bg="#347083",fg="#FFFFFF").grid(row=1, column=8)
+        self.search = tk.Entry(self.inventory_frame)
+        self.search.grid(row=1, column=9)
 
         tk.Button(self.inventory_frame, text="Add", command=self.add_item).grid(row=3, column=2, pady=10)
         tk.Button(self.inventory_frame, text="Update", command=self.update_item).grid(row=3, column=3, pady=10)
         tk.Button(self.inventory_frame, text="Delete", command=self.delete_item).grid(row=3, column=4, pady=10)
         tk.Button(self.inventory_frame, text="Clear", command=self.clear_entries).grid(row=3, column=5, pady=10)
+        tk.Button(self.inventory_frame, text="Search", command=self.search_item).grid(row=1, column=11, pady=10)
+        tk.Button(self.inventory_frame, text="refresh", command=self.refresh_inventory).grid(row=1, column=12, pady=10)
         tk.Button(self.inventory_frame, text="Logout", command=self.logout).grid(row=0, column=7, pady=5, padx=10)
         tk.Button(self.inventory_frame, text="Dashboard", command=self.dashboard).grid(row=0, column=8, pady=5, padx=10)
         tk.Button(self.inventory_frame, text="Add Users", command=self.add_employees).grid(row=0, column=9, pady=5, padx=10)
+        tk.Button(self.inventory_frame, text="Print", command=self.print_document).grid(row=0, column=10, pady=5, padx=10)
         
-        self.tree = ttk.Treeview(self.inventory_frame, columns=('ID', 'Name', 'Quantity', 'Price'), show='headings',height=40)
-        self.tree.heading('ID', text='ID')
+        self.tree = ttk.Treeview(self.inventory_frame, columns=('Sku', 'Name', 'Quantity', 'Price'), show='headings',height=40)
+        self.tree.heading('Sku', text='Sku')
         self.tree.heading('Name', text='Name')
         self.tree.heading('Quantity', text='Quantity')
         self.tree.heading('Price', text='Price')
-        self.tree.column('ID', width=70, anchor='center')
+        self.tree.column('Sku', width=70, anchor='center')
         self.tree.column('Name', width=170)
         self.tree.column('Quantity', width=170, anchor='center')
         self.tree.column('Price', width=170, anchor='center')
@@ -100,6 +111,8 @@ class InventoryApp:
         selected_item = self.tree.focus()
         if selected_item:
             values = self.tree.item(selected_item, 'values')
+            self.entry_item_sku.delete(0, tk.END)
+            self.entry_item_sku.insert(0, values[0])
             self.entry_item_name.delete(0, tk.END)
             self.entry_item_name.insert(0, values[1])
             self.entry_quantity.delete(0, tk.END)
@@ -119,10 +132,11 @@ class InventoryApp:
             self.entry_level.insert(0, values[3])
 
     def add_item(self):
+        sku = self.entry_item_sku.get()
         name = self.entry_item_name.get()
         quantity = int(self.entry_quantity.get())
         price = float(self.entry_price.get())
-        self.inventory_manager.add_item(name, quantity, price)
+        self.inventory_manager.add_item(sku, name, quantity, price)
         self.refresh_inventory()
         self.clear_entries()
 
@@ -144,17 +158,32 @@ class InventoryApp:
         self.clear_entries()
 
     def refresh_inventory(self):
+        self.search.delete(0, tk.END)
         for row in self.tree.get_children():
             self.tree.delete(row)
         for row in self.inventory_manager.get_all_items():
             self.tree.insert('', 'end', values=row)
 
     def clear_entries(self):
+        self.entry_item_sku.delete(0, tk.END)
         self.entry_item_name.delete(0, tk.END)
         self.entry_quantity.delete(0, tk.END)
         self.entry_price.delete(0, tk.END)
 
     #BUTTONS FUNCTIONS
+
+    def search_item(self):
+        search = int(self.search.get())
+        result = self.inventory_manager.get_item(search)
+
+        if result:  # If a result is found, insert it into the Treeview
+            for row in self.tree.get_children():
+                self.tree.delete(row)
+            self.tree.insert('', 'end', values=result)
+
+        else:
+            messagebox.showerror("Search", "Invalid search")
+
 
     def logout(self):
 
@@ -219,10 +248,17 @@ class InventoryApp:
         tk.Label(self.add_employees_frame, text="Password",bg="#347083",fg="#FFFFFF").grid(row=1, column=2)
         self.entry_password = tk.Entry(self.add_employees_frame)
         self.entry_password.grid(row=1, column=3)
+        
+        # tk.Label(self.add_employees_frame, text="Level",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
+        # self.entry_level = tk.Entry(self.add_employees_frame)
+        # self.entry_level.grid(row=1, column=5)
 
-        tk.Label(self.add_employees_frame, text="Level",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
-        self.entry_level = tk.Entry(self.add_employees_frame)
-        self.entry_level.grid(row=1, column=5)
+
+        self.level_var = tk.StringVar()
+        self.combobox_level = ttk.Combobox(self.add_employees_frame, textvariable=self.level_var)
+        self.combobox_level['values'] = ("user", "admin")  # Options for the combobox
+        self.combobox_level.grid(row=1, column=5)
+        self.combobox_level.current(0)  # Set the default value (0 index means "user")
 
         tk.Button(self.add_employees_frame, text="Add", command=self.add_user).grid(row=3, column=2, pady=10)
         tk.Button(self.add_employees_frame, text="Update", command=self.update_user).grid(row=3, column=3, pady=10)
@@ -243,7 +279,8 @@ class InventoryApp:
     def add_user(self):
         user_name = self.entry_employee_name.get()
         password = self.entry_password.get()
-        level = self.entry_level.get()
+        #level = self.entry_level.get()
+        level = self.level_var.get()
         self.user_manager.add_user(user_name, password, level)
         self.refresh_users()
         self.clear_users()
@@ -253,7 +290,8 @@ class InventoryApp:
         user_id = self.user_tree.item(selected_user, 'values')[0]
         name = self.entry_employee_name.get()
         password = self.entry_password.get()
-        level = self.entry_level.get()
+        level = self.level_var.get()
+        #level = self.entry_level.get()
         self.user_manager.update_user(user_id, name, password, level)
         self.refresh_users()
         self.clear_users()
@@ -274,7 +312,30 @@ class InventoryApp:
     def clear_users(self):
         self.entry_employee_name.delete(0, tk.END)
         self.entry_password.delete(0, tk.END)
-        self.entry_level.delete(0, tk.END)
+        #self.entry_level.delete(0, tk.END)
+
+    def print_document(self):
+        pdf = FPDF("P", "mm", "Letter")
+        pdf.add_page()
+        pdf.set_font("helvetica", "B", 16)
+        pdf.cell(0, 10, "Inventory Report", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+        pdf.ln(10)
+
+        pdf.set_font("helvetica", "B", 12)
+        pdf.cell(60, 10, "Name", 1)
+        pdf.cell(60, 10, "Quantity", 1)
+        pdf.cell(60, 10, "Price", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+
+        pdf.set_font("helvetica", "", 12)
+        for item in self.inventory_manager.get_all_items():
+            name = item[1]
+            quantity = item[2]
+            price = item[3]
+            pdf.cell(60, 10, name, 1)
+            pdf.cell(60, 10, str(quantity), 1)
+            pdf.cell(60, 10, f"{price}", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+
+        pdf.output("inventory_report.pdf")
 
 class InventoryApp_User(InventoryApp):
     def __init__(self,root):
