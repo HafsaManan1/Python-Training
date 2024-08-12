@@ -47,7 +47,12 @@ class InventoryApp:
         password = self.entry_password.get()
         user = self.user_manager.validate_user(username, password)
         if user:
-            self.create_inventory_window()
+            self.user_role = user[3]
+            if user[3]=="use":
+                self.login_frame.destroy()
+                InventoryApp_User(self.root)
+            if user[3]=="admin":
+                self.create_inventory_window()
         else:
             messagebox.showerror("Login", "Invalid username or password.")
         
@@ -75,8 +80,7 @@ class InventoryApp:
         tk.Button(self.inventory_frame, text="Delete", command=self.delete_item).grid(row=3, column=4, pady=10)
         tk.Button(self.inventory_frame, text="Clear", command=self.clear_entries).grid(row=3, column=5, pady=10)
         tk.Button(self.inventory_frame, text="Logout", command=self.logout).grid(row=0, column=7, pady=5, padx=10)
-
-    
+        tk.Button(self.inventory_frame, text="Dashboard", command=self.dashboard).grid(row=0, column=8, pady=5, padx=10)
         
         self.tree = ttk.Treeview(self.root, columns=('ID', 'Name', 'Quantity', 'Price'), show='headings',height=40)
         self.tree.heading('ID', text='ID')
@@ -144,6 +148,56 @@ class InventoryApp:
         root = tk.Tk()
         app = InventoryApp(root)
         root.mainloop()
+    def dashboard_back(self):
+        self.dashboard_frame.destroy()
+        self.create_inventory_window()
+
+    def dashboard(self):
+
+        self.inventory_frame.destroy()
+        self.tree.destroy()
+        self.dashboard_frame = tk.Frame(self.root,bg="#347083")
+        self.dashboard_frame.pack(fill="both",expand=True)
+        tk.Label(self.dashboard_frame, text="DASHBOARD", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").pack()
+        tk.Button(self.dashboard_frame, text="Back", command=self.dashboard_back,fg="#006CA5",bg="#FFFFFF").pack(pady=20)
+
+        items = self.inventory_manager.get_all_items()
+        names = [item[1] for item in items] 
+        quantities = [item[2] for item in items]  
+
+        fig1 = Figure()
+        plot1 = fig1.add_subplot(111)
+        plot1.bar(names,quantities,color="#347083")
+        plot1.tick_params(axis='x', labelrotation=90)
+        canvas = FigureCanvasTkAgg(fig1,self.dashboard_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side="left")
+        fig1.subplots_adjust(bottom=0.3)
+
+
+        fig2 = Figure()
+        plot1 = fig2.add_subplot(111)
+        plot1.pie(quantities, labels=names, autopct='%1.1f%%')
+        canvas = FigureCanvasTkAgg(fig2,self.dashboard_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side="right")
+
+class InventoryApp_User(InventoryApp):
+    def __init__(self,root):
+        super().__init__(root)
+        self.create_inventory_window()
+
+    def delete_item(self):
+        messagebox.showerror("ERROR", "You do not have the permission to delete")
+
+    def add_employees(self):
+        messagebox.showerror("ERROR", "You do not have the access to this field")
+
+
+
+
+
+
 
 
 
