@@ -7,6 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from db import Database
 from manager import UserManager, InventoryManager
 from fpdf import FPDF, XPos, YPos
+import os
+
 
 class InventoryApp:
     def __init__(self, root):
@@ -26,20 +28,20 @@ class InventoryApp:
 
     def create_login_window(self):
 
-        self.login_frame = tk.Frame(self.root,bg="#347083")
-        self.login_frame.pack(pady=20)
+        self.login_frame = tk.Frame(self.root,bg="#347083",highlightbackground="white", highlightthickness=2,highlightcolor="white", bd=40)
+        self.login_frame.pack(pady=(120),anchor=tk.CENTER)
         
-        tk.Label(self.login_frame, text="LOGIN",fg="#FFFFFF",bg="#347083",font=("Arial",30)).pack(pady=10)
+        tk.Label(self.login_frame, text="LOGIN",fg="#FFFFFF",bg="#347083",font=("Arial",30,"bold")).pack(pady=(10))
 
-        tk.Label(self.login_frame, text="Username",font=("Arial"),fg="#FFFFFF",bg="#347083").pack(pady=10)
-        self.entry_username = tk.Entry(self.login_frame,width=20)
-        self.entry_username.pack()
+        tk.Label(self.login_frame, text="Username",font=("Arial"),fg="#FFFFFF",bg="#347083").pack()
+        self.entry_username = tk.Entry(self.login_frame,width=25,font=("Arial"))
+        self.entry_username.pack(pady=(20),ipady=3)
 
-        tk.Label(self.login_frame, text="Password",font=("Arial"),fg="#FFFFFF",bg="#347083").pack(pady=10)
-        self.entry_password = tk.Entry(self.login_frame, show='●',width=20)
-        self.entry_password.pack()
+        tk.Label(self.login_frame, text="Password",font=("Arial"),fg="#FFFFFF",bg="#347083").pack()
+        self.entry_password = tk.Entry(self.login_frame, show='●',width=25,font=("Arial"))
+        self.entry_password.pack(pady=(20),ipady=3)
 
-        tk.Button(self.login_frame, text="Login", command=self.login,fg="#006CA5",bg="#FFFFFF").pack(pady=20)
+        tk.Button(self.login_frame, text="login", command=self.login, fg="#006CA5",bg="#FFFFFF", font=("Arial", 12), width=10, height=1, borderwidth=0, relief='groove').pack(pady=10)
         self.root.bind('<Return>', self.login)
 
     def login(self, event=None):
@@ -59,40 +61,40 @@ class InventoryApp:
     def create_inventory_window(self):
         self.login_frame.destroy()
         self.inventory_frame = tk.Frame(self.root,bg="#347083")
-        self.inventory_frame.pack(pady=10)
+        self.inventory_frame.pack()
 
-        tk.Label(self.inventory_frame, text="INVENTORY MANAGEMENT", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").grid(row=0,columnspan=8,pady=5)
+        tk.Label(self.inventory_frame, text="INVENTORY MANAGEMENT", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").grid(row=0, column=0,columnspan=10,pady=20)
 
-        tk.Label(self.inventory_frame, text="Sku",bg="#347083",fg="#FFFFFF").grid(row=1, column=0)
-        self.entry_item_sku = tk.Entry(self.inventory_frame)
-        self.entry_item_sku.grid(row=1, column=1)
+        tk.Label(self.inventory_frame, text="Sku",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=2, column=2)
+        self.entry_item_sku = tk.Entry(self.inventory_frame,width=15,font=("Arial",11))
+        self.entry_item_sku.grid(row=2, column=3)
         
-        tk.Label(self.inventory_frame, text="Name",bg="#347083",fg="#FFFFFF").grid(row=1, column=2)
-        self.entry_item_name = tk.Entry(self.inventory_frame)
-        self.entry_item_name.grid(row=1, column=3)
+        tk.Label(self.inventory_frame, text="Name",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=2, column=4)
+        self.entry_item_name = tk.Entry(self.inventory_frame,width=12,font=("Arial",11))
+        self.entry_item_name.grid(row=2, column=5)
 
-        tk.Label(self.inventory_frame, text="Quantity",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
-        self.entry_quantity = tk.Entry(self.inventory_frame)
-        self.entry_quantity.grid(row=1, column=5)
+        tk.Label(self.inventory_frame, text="Quantity",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=2, column=6)
+        self.entry_quantity = tk.Entry(self.inventory_frame,width=12,font=("Arial",11))
+        self.entry_quantity.grid(row=2, column=7)
 
-        tk.Label(self.inventory_frame, text="Price",bg="#347083",fg="#FFFFFF").grid(row=1, column=6)
-        self.entry_price = tk.Entry(self.inventory_frame)
-        self.entry_price.grid(row=1, column=7)
+        tk.Label(self.inventory_frame, text="Price",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=2, column=8)
+        self.entry_price = tk.Entry(self.inventory_frame,width=12,font=("Arial",11))
+        self.entry_price.grid(row=2, column=9)
 
-        tk.Label(self.inventory_frame, text="Search",bg="#347083",fg="#FFFFFF").grid(row=1, column=8)
-        self.search = tk.Entry(self.inventory_frame)
-        self.search.grid(row=1, column=9)
+        tk.Label(self.inventory_frame, text="Search",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=5, column=1)
+        self.search = tk.Entry(self.inventory_frame,width=12,font=("Arial",11))
+        self.search.grid(row=5, column=2)
 
-        tk.Button(self.inventory_frame, text="Add", command=self.add_item).grid(row=3, column=2, pady=10)
-        tk.Button(self.inventory_frame, text="Update", command=self.update_item).grid(row=3, column=3, pady=10)
-        tk.Button(self.inventory_frame, text="Delete", command=self.delete_item).grid(row=3, column=4, pady=10)
-        tk.Button(self.inventory_frame, text="Clear", command=self.clear_entries).grid(row=3, column=5, pady=10)
-        tk.Button(self.inventory_frame, text="Search", command=self.search_item).grid(row=1, column=11, pady=10)
-        tk.Button(self.inventory_frame, text="refresh", command=self.refresh_inventory).grid(row=1, column=12, pady=10)
-        tk.Button(self.inventory_frame, text="Logout", command=self.logout).grid(row=0, column=7, pady=5, padx=10)
-        tk.Button(self.inventory_frame, text="Dashboard", command=self.dashboard).grid(row=0, column=8, pady=5, padx=10)
-        tk.Button(self.inventory_frame, text="Add Users", command=self.add_employees).grid(row=0, column=9, pady=5, padx=10)
-        tk.Button(self.inventory_frame, text="Print", command=self.print_document).grid(row=0, column=10, pady=5, padx=10)
+        tk.Button(self.inventory_frame, text="add", command=self.add_item, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=4, pady=10)
+        tk.Button(self.inventory_frame, text="update", command=self.update_item, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=5, pady=10)
+        tk.Button(self.inventory_frame, text="delete", command=self.delete_item, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=6, pady=10)
+        tk.Button(self.inventory_frame, text="clear", command=self.clear_entries, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=7, pady=10)
+        tk.Button(self.inventory_frame, text="search", command=self.search_item, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=5, column=3, padx=5, pady=10)
+        tk.Button(self.inventory_frame, text="refresh", command=self.refresh_inventory, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=5, column=4,pady=10)
+        tk.Button(self.inventory_frame, text="Logout", command=self.logout, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=0, column=2, pady=10, padx=20)
+        tk.Button(self.inventory_frame, text="dashboard", command=self.dashboard, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=5, column=9, pady=10, padx=10)
+        tk.Button(self.inventory_frame, text="add user", command=self.add_employees, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=0, column=8, pady=10, padx=10)
+        tk.Button(self.inventory_frame, text="print inventory", command=self.print_document, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=5, column=8, pady=5, padx=10)
         
         self.tree = ttk.Treeview(self.inventory_frame, columns=('Sku', 'Name', 'Quantity', 'Price'), show='headings',height=40)
         self.tree.heading('Sku', text='Sku')
@@ -103,10 +105,9 @@ class InventoryApp:
         self.tree.column('Name', width=170)
         self.tree.column('Quantity', width=170, anchor='center')
         self.tree.column('Price', width=170, anchor='center')
-        self.tree.grid(row=4, column=0, columnspan=6, pady=10, padx=10)
+        self.tree.grid(row=6, column=0, columnspan=10, pady=10, padx=10)
         self.tree.bind('<<TreeviewSelect>>', self.on_item_select)
         self.refresh_inventory()
-
     def on_item_select(self, event):
         selected_item = self.tree.focus()
         if selected_item:
@@ -119,17 +120,6 @@ class InventoryApp:
             self.entry_quantity.insert(0, values[2])
             self.entry_price.delete(0, tk.END)
             self.entry_price.insert(0, values[3])
-
-    def on_user_select(self, event):
-        selected_user = self.user_tree.focus()
-        if selected_user:
-            values = self.user_tree.item(selected_user, 'values')
-            self.entry_employee_name.delete(0, tk.END)
-            self.entry_employee_name.insert(0, values[1])
-            self.entry_password.delete(0, tk.END)
-            self.entry_password.insert(0, values[2])
-            self.entry_level.delete(0, tk.END)
-            self.entry_level.insert(0, values[3])
 
     def add_item(self):
         sku = self.entry_item_sku.get()
@@ -184,33 +174,70 @@ class InventoryApp:
         else:
             messagebox.showerror("Search", "Invalid search")
 
-
     def logout(self):
-
         self.root.destroy()
         root = tk.Tk()
         app = InventoryApp(root)
         root.mainloop()
 
-
-    def dashboard_back(self):
-        self.dashboard_frame.destroy()
-        self.create_inventory_window()
-
-    def add_user_back(self):
-        self.add_employees_frame.destroy()
-        self.user_tree.destroy()
-        self.create_inventory_window()
-
     def dashboard(self):
-
         self.inventory_frame.destroy()
         self.tree.destroy()
+        Dashboard(self.root, self.inventory_manager,self.create_inventory_window)
+
+    def add_employees(self):
+        self.inventory_frame.destroy()
+        self.tree.destroy()
+        Add_Employee(self.root,self.user_manager,self.create_inventory_window)
+
+    def print_document(self):
+        pdf = FPDF("P", "mm", "Letter")
+        pdf.add_page()
+        pdf.set_font("helvetica", "B", 16)
+        pdf.cell(0, 10, "Inventory Report", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+        pdf.ln(10)
+
+        pdf.set_font("helvetica", "B", 12)
+        pdf.cell(60, 10, "Name", 1)
+        pdf.cell(60, 10, "Quantity", 1)
+        pdf.cell(60, 10, "Price", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+
+        pdf.set_font("helvetica", "", 12)
+        for item in self.inventory_manager.get_all_items():
+            name = item[1]
+            quantity = item[2]
+            price = item[3]
+            pdf.cell(60, 10, name, 1)
+            pdf.cell(60, 10, str(quantity), 1)
+            pdf.cell(60, 10, f"{price}", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
+        pdf_path = "inventory_report.pdf"
+        pdf.output(pdf_path)
+        os.startfile(pdf_path, "print")
+
+class InventoryApp_User(InventoryApp):
+    def __init__(self,root):
+        super().__init__(root)
+        self.create_inventory_window()
+
+    def delete_item(self):
+        messagebox.showerror("ERROR", "You do not have the permission to delete")
+
+    def add_employees(self):
+        messagebox.showerror("ERROR", "You do not have the access to this field")
+
+
+class Dashboard:
+    def __init__(self,root,inventory_manager,create_inventory_window):
+        self.root = root
+        self.inventory_manager = inventory_manager
+        self.create_inventory_window = create_inventory_window
         self.dashboard_frame = tk.Frame(self.root,bg="#347083")
         self.dashboard_frame.pack(fill="both",expand=True)
-        tk.Label(self.dashboard_frame, text="DASHBOARD", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").pack()
-        tk.Button(self.dashboard_frame, text="Back", command=self.dashboard_back,fg="#006CA5",bg="#FFFFFF").pack(pady=20)
-
+        tk.Label(self.dashboard_frame, text="DASHBOARD", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").pack(pady=20)
+        tk.Button(self.dashboard_frame, text="Back", command=self.dashboard_back, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').pack(pady=20,padx=20)
+        self.creat_graphs()
+    
+    def creat_graphs(self):
         items = self.inventory_manager.get_all_items()
         names = [item[1] for item in items] 
         quantities = [item[2] for item in items]  
@@ -223,8 +250,6 @@ class InventoryApp:
         canvas.draw()
         canvas.get_tk_widget().pack(side="left")
         fig1.subplots_adjust(bottom=0.3)
-
-
         fig2 = Figure()
         plot1 = fig2.add_subplot(111)
         plot1.pie(quantities, labels=names, autopct='%1.1f%%')
@@ -232,37 +257,44 @@ class InventoryApp:
         canvas.draw()
         canvas.get_tk_widget().pack(side="right")
 
-    def add_employees(self):
-        self.inventory_frame.destroy()
-        self.tree.destroy()
+    def dashboard_back(self):
+        self.dashboard_frame.destroy()
+        self.create_inventory_window()
+
+class Add_Employee:
+    def __init__(self,root,user_manager,create_inventory_window):
+        self.root = root
+        self.user_manager = user_manager
+        self.create_inventory_window = create_inventory_window
+
         self.add_employees_frame = tk.Frame(self.root, bg="#347083")
         self.add_employees_frame.pack(pady=20)
         tk.Label(self.add_employees_frame, text="USER", font=("Arial",20,"bold"),bg="#347083",fg="#FFFFFF").grid(row=0,columnspan=8,pady=5)
-        tk.Button(self.add_employees_frame, text="Back", command=self.add_user_back,fg="#006CA5",bg="#FFFFFF").grid(row=0, column=2, pady=10)
+        tk.Button(self.add_employees_frame, text="Back", command=self.add_user_back, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=0, column=2, pady=10)
 
 
-        tk.Label(self.add_employees_frame, text="Name",bg="#347083",fg="#FFFFFF").grid(row=1, column=0)
-        self.entry_employee_name = tk.Entry(self.add_employees_frame)
+        tk.Label(self.add_employees_frame, text="Name",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=1, column=0)
+        self.entry_employee_name = tk.Entry(self.add_employees_frame,width=12,font=("Arial",11))
         self.entry_employee_name.grid(row=1, column=1)
 
-        tk.Label(self.add_employees_frame, text="Password",bg="#347083",fg="#FFFFFF").grid(row=1, column=2)
-        self.entry_password = tk.Entry(self.add_employees_frame)
+        tk.Label(self.add_employees_frame, text="Password",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=1, column=2)
+        self.entry_password = tk.Entry(self.add_employees_frame,width=12,font=("Arial",11))
         self.entry_password.grid(row=1, column=3)
         
-        # tk.Label(self.add_employees_frame, text="Level",bg="#347083",fg="#FFFFFF").grid(row=1, column=4)
+        tk.Label(self.add_employees_frame, text="Level",bg="#347083",fg="#FFFFFF",font=("Arial",11)).grid(row=1, column=4)
         # self.entry_level = tk.Entry(self.add_employees_frame)
         # self.entry_level.grid(row=1, column=5)
 
 
         self.level_var = tk.StringVar()
-        self.combobox_level = ttk.Combobox(self.add_employees_frame, textvariable=self.level_var)
+        self.combobox_level = ttk.Combobox(self.add_employees_frame, textvariable=self.level_var,width=12,font=("Arial",11))
         self.combobox_level['values'] = ("user", "admin")  # Options for the combobox
         self.combobox_level.grid(row=1, column=5)
         self.combobox_level.current(0)  # Set the default value (0 index means "user")
 
-        tk.Button(self.add_employees_frame, text="Add", command=self.add_user).grid(row=3, column=2, pady=10)
-        tk.Button(self.add_employees_frame, text="Update", command=self.update_user).grid(row=3, column=3, pady=10)
-        tk.Button(self.add_employees_frame, text="Delete", command=self.delete_user).grid(row=3, column=4, pady=10)
+        tk.Button(self.add_employees_frame, text="Add", command=self.add_user, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=2, pady=10)
+        tk.Button(self.add_employees_frame, text="Update", command=self.update_user, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=3, pady=10)
+        tk.Button(self.add_employees_frame, text="Delete", command=self.delete_user, fg="#006CA5",bg="#FFFFFF", font=("Arial", 11), width=10, height=1, borderwidth=0, relief='groove').grid(row=3, column=4, pady=10)
 
         self.user_tree = ttk.Treeview(self.add_employees_frame, columns=('ID','Name', 'Password', 'Level'), show='headings',height=40)
         self.user_tree.heading('ID', text='ID')
@@ -279,7 +311,6 @@ class InventoryApp:
     def add_user(self):
         user_name = self.entry_employee_name.get()
         password = self.entry_password.get()
-        #level = self.entry_level.get()
         level = self.level_var.get()
         self.user_manager.add_user(user_name, password, level)
         self.refresh_users()
@@ -314,39 +345,20 @@ class InventoryApp:
         self.entry_password.delete(0, tk.END)
         #self.entry_level.delete(0, tk.END)
 
-    def print_document(self):
-        pdf = FPDF("P", "mm", "Letter")
-        pdf.add_page()
-        pdf.set_font("helvetica", "B", 16)
-        pdf.cell(0, 10, "Inventory Report", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
-        pdf.ln(10)
-
-        pdf.set_font("helvetica", "B", 12)
-        pdf.cell(60, 10, "Name", 1)
-        pdf.cell(60, 10, "Quantity", 1)
-        pdf.cell(60, 10, "Price", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
-
-        pdf.set_font("helvetica", "", 12)
-        for item in self.inventory_manager.get_all_items():
-            name = item[1]
-            quantity = item[2]
-            price = item[3]
-            pdf.cell(60, 10, name, 1)
-            pdf.cell(60, 10, str(quantity), 1)
-            pdf.cell(60, 10, f"{price}", 1, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
-
-        pdf.output("inventory_report.pdf")
-
-class InventoryApp_User(InventoryApp):
-    def __init__(self,root):
-        super().__init__(root)
+    def add_user_back(self):
+        self.add_employees_frame.destroy()
+        self.user_tree.destroy()
         self.create_inventory_window()
 
-    def delete_item(self):
-        messagebox.showerror("ERROR", "You do not have the permission to delete")
+    def on_user_select(self, event):
+        selected_user = self.user_tree.focus()
+        if selected_user:
+            values = self.user_tree.item(selected_user, 'values')
+            self.entry_employee_name.delete(0, tk.END)
+            self.entry_employee_name.insert(0, values[1])
+            self.entry_password.delete(0, tk.END)
+            self.entry_password.insert(0, values[2])
 
-    def add_employees(self):
-        messagebox.showerror("ERROR", "You do not have the access to this field")
 
 
 if __name__ == "__main__":
