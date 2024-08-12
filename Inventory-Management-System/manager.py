@@ -7,6 +7,16 @@ class UserManager:
 
     def validate_user(self, username, password):
         return self.db.fetchone('SELECT * FROM users WHERE username=? AND password=?', (username, password))
+    
+    def update_user(self, user_id, username, password, level):
+        self.db.execute('UPDATE users SET username=?, password=?, level=? WHERE id=?', (username, password, level, user_id))
+
+    def delete_user(self, user_id):
+        self.db.execute('DELETE FROM users WHERE id=?', (user_id,))
+
+    def get_all_users(self):
+        return self.db.fetchall('SELECT * FROM users')
+
 
 
 class InventoryManager:
