@@ -11,7 +11,8 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
-                level TEXT NOT NULL
+                level TEXT NOT NULL,
+                active BOOL DEFAULT 0
             )
         ''')
         self.cursor.execute('''
