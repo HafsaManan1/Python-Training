@@ -22,6 +22,19 @@ class UserManager:
 
     def get_active_users(self):
         return self.db.fetchall('SELECT * FROM users WHERE active=?', (1,))
+    
+    def get_active_id(self):
+        return self.db.fetchall('SELECT id FROM users WHERE active=?', (1,))
+    
+    def search_users_by_name(self, name):
+        query = 'SELECT * FROM users WHERE username LIKE ?'
+        parameter = f'%{name}%'
+        return self.db.fetchall(query, (parameter,))
+    
+    def username_exists(self, username):
+        result = self.db.fetchone('SELECT * FROM users WHERE username=?', (username,))
+        return result is not None
+
 
 class InventoryManager:
     def __init__(self, database):
@@ -39,9 +52,21 @@ class InventoryManager:
     def get_all_items(self):
         return self.db.fetchall('SELECT * FROM inventory')
     
-    def get_item_name(self,name):
-        return self.db.fetchone('SELECT * FROM inventory WHERE name=?',(name,))
+    def get_item_name(self, name):
+        query = 'SELECT * FROM inventory WHERE name LIKE ?'
+        search_term = f'%{name}%' 
+        return self.db.fetchall(query, (search_term,))
     
     def get_item_sku(self,item_id):
-        return self.db.fetchone('SELECT * FROM inventory WHERE id=?',(item_id,))
+        return self.db.fetchall('SELECT * FROM inventory WHERE id=?',(item_id,))
+    
+    def get_total_item(self):
+        return self.db.fetchone('SELECT COUNT(*) FROM inventory')
+
+    def get_low_stock(self):
+        return self.db.fetchone('SELECT COUNT(*) FROM inventory WHERE quantity < 10')
+
+    def get_out_of_stock(self):
+        return self.db.fetchone('SELECT COUNT(*) FROM inventory WHERE quantity = 0')
+    
 

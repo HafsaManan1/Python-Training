@@ -10,20 +10,29 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light" style="background-color: #377771;">
+    <nav class="navbar navbar-light" style="background-color: #1f5a96;">
         <div class="container-fluid">
-            <a class="navbar-brand">TO DO LIST</a>
+            <a class="navbar-brand text-white">
+                <img src="https://osoltech.com/hs-fs/hubfs/favicon.png?width=48&amp;height=48&amp;name=favicon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                Osol - To Do List</a>
         </div>
     </nav>
 
     <div class="container my-4">
         <h3>Add a Todo</h3>
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <form action="{{ url_for('add') }}" method="post" class="mb-4">
             <div class="mb-3">
                 <input type="text" name="todo" class="form-control" placeholder="Enter task" required>
             </div>
             <center>
-                <button type="submit" class="btn btn-primary" style="background-color: #377771; border: #377771; padding: 10px 40px; font-size: 20px;">Add</button>
+                <button type="submit" class="btn btn-primary" style="background-color: #1f5a96; border: #1f5a96; padding: 10px 40px; font-size: 20px;">Add</button>
             </center>
         </form>
 

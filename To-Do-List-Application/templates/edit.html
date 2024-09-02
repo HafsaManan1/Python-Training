@@ -11,13 +11,23 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light" style="background-color: #377771;">
+    <nav class="navbar navbar-light" style="background-color: #1f5a96;">
         <div class="container-fluid">
-            <a class="navbar-brand">TO DO LIST</a>
+            <a class="navbar-brand text-white">
+                <img src="https://osoltech.com/hs-fs/hubfs/favicon.png?width=48&amp;height=48&amp;name=favicon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                Osol - To Do List</a>
         </div>
     </nav>
+
     <div class="container my-4">
         <h3>Edit Todo</h3>
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <form action="{{ url_for('edit', index=index) }}" method="post">
             <div class="mb-3">
                 <label for="task" class="form-label">Task</label>
@@ -25,7 +35,7 @@
             </div>
             <center>
                 <button type="submit" class="btn btn-primary"
-                    style="background-color: #377771; border: #377771; padding: 10px 40px; font-size: 20px;">Save
+                    style="background-color: #1f5a96; border: #1f5a96; padding: 10px 40px; font-size: 20px;">Save
                     Changes</button>
             </center>
         </form>
