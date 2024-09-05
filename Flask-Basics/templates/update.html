@@ -10,24 +10,24 @@
 {% endfor %}
 {% if name %}
 <h1>
-  hello {{name}}
+ Update User
 </h1>
 {% else %}
 <h1>
-Users
+  What is your name?
 </h1>
 <br>
-<form action="{{ url_for('name')}}" method="POST">
+<form action ="/update/{{name_to_update.id}}"  method="POST">
   {{ form.hidden_tag() }}
 
   {{ form.name.label(class="form-label") }}
-  {{ form.name(class="form-control") }}
+  {{ form.name(class="form-control", value = name_to_update.name) }}
   <br>
   {{ form.email.label(class="form-label") }}
-  {{ form.email(class="form-control") }}
+  {{ form.email(class="form-control", value = name_to_update.email) }}
   <br>
   {{ form.fav_color.label(class="form-label") }}
-  {{ form.fav_color(class="form-control") }}
+  {{ form.fav_color(class="form-control", value = name_to_update.fav_color) }}
   <br>
   {{ form.submit(class="btn btn-secondary") }}
 
@@ -36,7 +36,7 @@ Users
 <br><br><br>
 
 {% for our_user in our_users %}
-{{our_user.id}}. <a href="{{url_for('update',id=our_user.id)}}"> {{our_user.name}}</a> - {{our_user.email}} - {{our_user.fav_color}} <a href="{{url_for('delete',id=our_user.id)}}"> Delete</a>
+{{our_user.id}}. <a href="{{url_for('update',id=our_user.id)}}"> {{our_user.name}}</a> - {{our_user.email}} - {{our_user.fav_color}}
 <br>
 {% endfor %}
 
