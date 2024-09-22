@@ -1,4 +1,6 @@
 import tkinter as tk
+# import ttkbootstrap as tb
+# from ttkbootstrap.toast import ToastNotification
 from tkinter import ttk, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure 
@@ -21,28 +23,58 @@ class Login:
         self.root.state("zoomed")
         self.root.title("Inventory Management System")
         root.configure(background='#d9d9d9')
+        self.password_visible = False
         self.create_login_window()
 
     def create_login_window(self):
-        self.login_frame = tk.Frame(self.root, bg="#F0F0F0", bd=40)
-        self.login_frame.pack(pady=(120), anchor=tk.CENTER)
+        self.login_frame = tk.Frame(self.root, bg="#F0F0F0", bd=40, width=350)
+        self.login_frame.pack(pady=(110), anchor=tk.CENTER)
 
         self.login_image = tk.PhotoImage(file="icon.png")
 
         tk.Label(self.login_frame, text="WELCOME", fg="#333333", bg="#F0F0F0", font=("Arial", 30, "bold")).pack(pady=(10))
         self.picture = tk.Label(self.login_frame, image=self.login_image)
-        self.picture.pack(expand=True)
+        self.picture.pack(fill="both", expand="yes")
 
-        tk.Label(self.login_frame, text="Username", font=("Arial", 12), fg="#333333", bg="#F0F0F0").pack()
+        tk.Label(self.login_frame, text="Username", font=("Arial", 14), fg="#333333", bg="#F0F0F0").pack(anchor="w")
         self.entry_username = tk.Entry(self.login_frame, width=25, font=("Arial", 12), bg="#e0e0e0")
-        self.entry_username.pack(pady=(10), ipady=3)
+        self.entry_username.insert(0,"Username")
+        self.entry_username.bind("<FocusIn>", lambda e: self.entry_username.delete(0, tk.END))
+        self.entry_username.pack(pady=10, ipady=3)
 
-        tk.Label(self.login_frame, text="Password", font=("Arial", 12), fg="#333333", bg="#F0F0F0").pack()
+        tk.Label(self.login_frame, text="Password", font=("Arial", 14), fg="#333333", bg="#F0F0F0").pack(anchor="w")
         self.entry_password = tk.Entry(self.login_frame, show='●', width=25, font=("Arial", 12), bg="#e0e0e0")
-        self.entry_password.pack(pady=(10), ipady=3)
+        self.entry_password.insert(0,"Password")
+        self.entry_password.bind("<FocusIn>", lambda e: self.entry_password.delete(0, tk.END))
+        self.entry_password.pack(pady=10, ipady=3)
+
+        self.show_password_icon = tk.PhotoImage(file="eye.png")  # Replace with your eye icon file path
+        self.hide_password_icon = tk.PhotoImage(file="eye_hide.png")  # Replace with your hide icon file path
+        self.eye_button = tk.Button(self.login_frame, image=self.show_password_icon, command=self.toggle_password_visibility, bd=0, bg="#e0e0e0")
+        self.eye_button.place(x=205, y=260)  # Adjust position as needed
 
         tk.Button(self.login_frame, text="Login", command=self.login, fg="#ffffff", bg="#6a1b9a", font=("Arial", 12), width=25, height=1, borderwidth=0).pack(pady=10)
         self.root.bind('<Return>', self.login)
+
+    def on_focus_in_username(self, event):
+        if self.entry_username.get() == "Username":
+            self.entry_username.delete(0, tk.END)
+            self.entry.config(fg="#808080")
+
+    def on_focus_in_password(self, event):
+        if self.entry_password.get() == "Password":
+            self.entry_password.delete(0, tk.END)
+            self.entry_password.config(show="●",fg="#808080")
+
+    def toggle_password_visibility(self):
+        if self.password_visible:
+            self.entry_password.config(show="●")
+            self.eye_button.config(image=self.show_password_icon)
+            self.password_visible = False
+        else:
+            self.entry_password.config(show="")
+            self.eye_button.config(image=self.hide_password_icon)
+            self.password_visible = True
 
     def login(self, event=None):
         username = self.entry_username.get()
@@ -58,24 +90,22 @@ class Login:
                 messagebox.showinfo("Login",f"Logging in as {self.user_name} (user)")
                 self.login_frame.forget()
                 self.root.unbind('<Return>')
-                Dashboard_User(self.root,self.user_id,self.user_name,self.user_role)
+                Dashboard_User(self.root,self.user_id,self.user_role)
             if self.user[3]=="admin":
                 messagebox.showinfo("Login",f"Logging in as {self.user_name} (admin)")
                 self.login_frame.forget()
                 self.root.unbind('<Return>')
-                Dashboard(self.root,self.user_id,self.user_name,self.user_role)
+                Dashboard(self.root,self.user_id,self.user_role)
         else:
             messagebox.showerror("Login", "Invalid username or password.")
-        
 
 class Dashboard:
-    def __init__(self,root,user_id,user_name,user_role):
+    def __init__(self,root,user_id,user_role):
         self.root = root
         self.db = Database()
         self.inventory_manager = InventoryManager(self.db)
         self.user_manager = UserManager(self.db)
         self.user_id = user_id
-        self.user_name = user_name
         self.user_role = user_role
         self.total_products = self.inventory_manager.get_total_item()[0]
         self.low_stock_products = self.inventory_manager.get_low_stock()[0]
@@ -102,19 +132,18 @@ class Dashboard:
         self.side_bar.pack(fill="y",side="left")
 
         tk.Button(self.side_bar, text=" Osol-Tech", fg="#ffffff", bg="#6a1b9a", activebackground="#6a1b9a",
-                  font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w", compound="left",image=self.logo).pack(padx=20,pady=(10,80))
-        # tk.Label(self.side_bar,text="", font=("Arial", 15),bg="#6a1b9a").pack(pady=65)
+                  font=("Arial", 18), width=170, height=50, borderwidth=0,anchor="w", compound="left",image=self.logo).pack(padx=20,pady=(10,80))
         self.add_user_button = tk.Button(self.side_bar, text=" Add User",image=self.user,compound="left", command=self.add_employees, fg="#ffffff", bg="#6a1b9a",activebackground="#6a1b9a", 
-                                         font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w")
+                                         font=("Arial", 14), width=170, height=50, borderwidth=0,anchor="w")
         self.add_user_button.pack(padx=20,pady=15)
-        self.dashboard_button = tk.Button(self.side_bar, text=" Add Inventory", command=self.add_inventory, fg="#ffffff", bg="#6a1b9a",activebackground="#6a1b9a", font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.dashh)
+        self.dashboard_button = tk.Button(self.side_bar, text=" Add Inventory", command=self.add_inventory, fg="#ffffff", bg="#6a1b9a",activebackground="#6a1b9a", font=("Arial", 14), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.dashh)
         self.dashboard_button.pack(padx=20,pady=10)
         tk.Button(self.side_bar, text=" Add Account", command=self.add_account, fg="#ffffff", bg="#6a1b9a", activebackground="#6a1b9a",
-                  font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.add).pack(padx=20,pady=10)
+                  font=("Arial", 14), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.add).pack(padx=20,pady=10)
         tk.Button(self.side_bar, text=" Switch User", command=self.switch_user, fg="#ffffff", bg="#6a1b9a", activebackground="#6a1b9a",
-                  font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.interaction).pack(padx=20,pady=10)
+                  font=("Arial", 14), width=170, height=50, borderwidth=0,anchor="w",compound="left",image=self.interaction).pack(padx=20,pady=10)
         tk.Button(self.side_bar, text=" Logout", command=self.logout, fg="#ffffff", bg="#6a1b9a", activebackground="#6a1b9a",
-                  font=("Arial", 15), width=170, height=50, borderwidth=0,anchor="w", compound="left",image=self.log_out).pack(padx=20,pady=10)
+                  font=("Arial", 14), width=170, height=50, borderwidth=0,anchor="w", compound="left",image=self.log_out).pack(padx=20,pady=10)
         self.create_graphs()
 
     def create_graphs(self):
@@ -161,7 +190,7 @@ class Dashboard:
 
     def add_account(self):
         if len(self.user_manager.get_active_users())>=2:
-            messagebox.showerror("Add Account","Can add more than 2 accounts")
+            messagebox.showerror("Add Account","Can't add more than 2 accounts")
         else:
             self.dashboard_frame.pack_forget()
             Login(self.root)
@@ -195,7 +224,7 @@ class Dashboard:
         Add_Employee(self.root,self.dashboard_frame)
 
     def logout(self):
-        response = messagebox.askyesno("Confirm Logout", f"Are you sure you want to log out from {self.user_name}?")
+        response = messagebox.askyesno("Confirm Logout", "Are you sure you want to log out?")
         if response:  
             self.user_manager.update_user_active_status(self.user_id, active=0)
             active_users = self.user_manager.get_active_users()
@@ -207,20 +236,19 @@ class Dashboard:
                 self.user_role = user[3]
 
                 if self.user_role == "admin":
-                    Dashboard(self.root,self.user_id,self.user_name,self.user_role)
+                    Dashboard(self.root,self.user_id,self.user_role)
 
                 elif self.user_role == "user":
-                    Dashboard_User(self.root,self.user_id,self.user_name,self.user_role)
+                    Dashboard_User(self.root,self.user_id,self.user_role)
             else:
                 self.dashboard_frame.pack_forget()
                 Login(self.root)
 
 class Dashboard_User(Dashboard):
-    def __init__(self,root,user_id,user_name,user_role):
-        super().__init__(root,user_role,user_name,user_id)
+    def __init__(self,root,user_id,user_role):
+        super().__init__(root,user_role,user_id)
         self.root = root
         self.user_id = user_id
-        self.user_name = user_name
         self.user_role = user_role
         self.add_user_button.pack_forget()
     
@@ -249,6 +277,9 @@ class InventoryApp:
         for id in self.user_manager.get_active_id():
             self.user_manager.update_user_active_status(id[0],0)
         self.root.destroy()
+
+    # def validate_sku(self, sku):
+    #     return bool(self.sku_pattern.match(sku))
 
     def validate_price(self, price):
         return bool(self.price_pattern.match(price)) and float(price) > 0
@@ -336,14 +367,13 @@ class InventoryApp:
     
         tk.Button(self.right_frame, text="Print List", command=self.print_document, fg="#ffffff", bg="#6a1b9a", 
                 font=("Arial", 11), width=10, height=1, borderwidth=2).grid(row=0, column=0,sticky="e",padx=20,pady=5)
-        
         self.scroll_bar = ttk.Scrollbar(self.right_frame, orient="vertical")
         self.scroll_bar.grid(column=1, sticky='ns', padx=(0, 10))
         self.tree = ttk.Treeview(self.right_frame, columns=('Sku', 'Name', 'Quantity', 'Price'), show='headings',height=17)
         self.tree.heading('Sku', text='Sku')
         self.tree.heading('Name', text='Name')
         self.tree.heading('Quantity', text='Quantity')
-        self.tree.heading('Price', text='Price per unit')
+        self.tree.heading('Price', text='Price')
         self.tree.column('Sku', width=70, anchor='center')
         self.tree.column('Name', width=170)
         self.tree.column('Quantity', width=170, anchor='center')
@@ -376,13 +406,9 @@ class InventoryApp:
             messagebox.showerror("Validation Error", "All fields are mandatory. Please fill in all fields.")
             return
 
-        if self.inventory_manager.get_item_sku(sku):
-            messagebox.showerror("Validation Error", "Item with this SKU already exists.")
-            return
-
-        if self.inventory_manager.get_item_name(name):
-            messagebox.showerror("Validation Error", "Item with this name already exists.")
-            return
+        # if not self.validate_sku(sku):
+        #     messagebox.showerror("Validation Error", "SKU must be a non-negative integer.")
+        #     return
 
         if not self.validate_price(price):
             messagebox.showerror("Validation Error", "Price must be a positive float.")
@@ -416,7 +442,10 @@ class InventoryApp:
         if not sku or not name or not quantity or not price:
             messagebox.showerror("Validation Error", "All fields are mandatory. Please fill in all fields.")
             return
-
+        # if not self.validate_sku(sku):
+        #     messagebox.showerror("Validation Error", "SKU must be a non-negative integer.")
+        #     return
+        
         if not self.validate_price(price):
             messagebox.showerror("Validation Error", "Price must be a positive float.")
             return
@@ -451,12 +480,7 @@ class InventoryApp:
         for row in self.tree.get_children():
             self.tree.delete(row)
         for row in self.inventory_manager.get_all_items():
-            sku = row[0]
-            name = row[1]
-            quantity = row[2]
-            price = row[3]
-            price = f"${price}"
-            self.tree.insert('', 'end', values=(sku, name, quantity, price))
+            self.tree.insert('', 'end', values=row)
 
     def clear_entries(self):
         self.entry_item_sku.delete(0, tk.END)
@@ -472,18 +496,18 @@ class InventoryApp:
             messagebox.showerror("Search", "Please select only one option sku or name.")
 
         if self.sku_var.get():
-            search = self.search.get()  
+            search = self.search.get()  # Assuming 'search' is an Entry widget that takes the SKU number
             if not search:
                 messagebox.showerror("Search", "Please enter sku to search.")
                 return
 
-            results = self.inventory_manager.get_item_sku(int(search)) 
+            results = self.inventory_manager.get_item_sku(int(search))  # You will need to define this method in your inventory manager
         elif self.name_var.get():
-            search = self.search.get() 
+            search = self.search.get()  # Assuming 'search' is an Entry widget that takes the item name
             if not search:
                 messagebox.showerror("Search", "Please enter a name to search.")
                 return
-            results = self.inventory_manager.get_item_name(search) 
+            results = self.inventory_manager.get_item_name(search)  # You will need to define this method in your inventory manager
         else:
             messagebox.showerror("Search", "Please select either SKU or Name to search by.")
             return
@@ -566,7 +590,7 @@ class Add_Employee:
         self.style.configure("Treeview",background= "#ffffff", foreground = "black", rowheight= 25, fieldbackground="#ffffff")
         self.style.map("Treeview",background=[("selected","#6a1b9a")])
         self.username_pattern = r'^[a-zA-Z][a-zA-Z0-9_]{4,14}$'
-        self.password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{5,20}$'
+        self.password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,20}$'
 
         self.add_employees_frame = ttk.Frame(self.root)
         self.add_employees_frame.pack(expand=True, fill="both")
@@ -638,10 +662,6 @@ class Add_Employee:
         password = self.entry_password.get()
         level = self.level_var.get()
 
-        if self.user_manager.username_exists(user_name):
-            messagebox.showerror("Duplicate Username", "The username already exists. Please choose a different username.")
-            return
-
         if not user_name or not password or not level:
             messagebox.showerror("Validation Error", "All fields are mandatory. Please fill in all fields.")
             return
@@ -653,7 +673,6 @@ class Add_Employee:
         if not re.match(self.password_pattern, password):
             messagebox.showerror("Invalid Password", "Password must be 8-20 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character.")
             return
-
         self.user_manager.add_user(user_name, password, level)
         self.refresh_users()
         self.clear_users()
@@ -683,12 +702,9 @@ class Add_Employee:
             messagebox.showerror("Delete", "No user selected.")
             return
         user_id = self.user_tree.item(selected_user, 'values')[0]
-        user_name = self.user_tree.item(selected_user, 'values')[1]
-        confirm = messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete the user: {user_name}?")
-        if confirm:  # If the user clicks "Yes"
-            self.user_manager.delete_user(user_id)
-            self.refresh_users()
-            self.clear_users()
+        self.user_manager.delete_user(user_id)
+        self.refresh_users()
+        self.clear_users()
 
     def search_user(self):
         search_name = self.search.get()
@@ -711,11 +727,7 @@ class Add_Employee:
         for row in self.user_tree.get_children():
             self.user_tree.delete(row)
         for row in self.user_manager.get_all_users():
-            id = row[0]
-            username = row[1]
-            password = row[2]
-            level = row[3]
-            self.user_tree.insert('', 'end', values=(id,username,password,level))
+            self.user_tree.insert('', 'end', values=row)
 
     def clear_users(self):
         self.entry_employee_name.delete(0, tk.END)
