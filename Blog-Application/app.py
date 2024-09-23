@@ -183,6 +183,9 @@ def delete(id):
 def add_post():
     form = PostForm()
     if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("Please Login in order to comment")
+            return redirect(url_for('login'))
         poster = current_user.id
         post = Posts(title=form.title.data, poster_id = poster, content = form.content.data, slug = form.slug.data)
         form.title.data = ''

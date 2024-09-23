@@ -3,11 +3,12 @@
 {% for message in get_flashed_messages() %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
   {{message}}
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% endfor %}
+<div class="container my-4">
 <div class="shadow p-3 mb-5 bg-body rounded">
 {{post.title}}
 {{post.id}}
@@ -32,7 +33,7 @@
   
   {{ form.submit(class="btn btn-secondary") }}
 </form>
-</div>
+
 
 <h3>Comments</h3>
 {% for comment in comments %}
@@ -49,5 +50,6 @@
 {% if next %}
 <a href="?number={{ next }}">Next &raquo;</a>
 {% endif %}
+</div>
 {% endblock %}
 
