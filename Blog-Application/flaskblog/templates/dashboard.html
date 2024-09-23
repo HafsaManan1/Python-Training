@@ -1,4 +1,4 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 {% block content %}
 {% for message in get_flashed_messages() %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -8,54 +8,73 @@
 </div>
 {% endfor %}
 <div class="container my-4">
-<h3>
-User Profile
-</h3>
+  <h3>User Profile</h3>
 
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title">{{current_user.name}}</h5>
-    <p class="card-text">{{current_user.bio}}</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <!-- User Information on the Left -->
+        <div class="col-8">
+          <h5 class="card-title">{{current_user.name}}</h5>
+          <p class="card-text">{{current_user.bio}}</p>
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Username: {{current_user.username}}</li>
+            <li class="list-group-item">Email: {{current_user.email}}</li>
+            <li class="list-group-item">Date Joined: {{current_user.date_added}}</li>
+          </ul>
+          
+          <div class="card-body">
+            <a href="{{url_for('author.delete', id=current_user.id)}}" class="btn btn-outline-secondary">Delete</a>
+            <a href="{{url_for('author.logout')}}" class="btn btn-outline-secondary">Logout</a>
+          </div>
+        </div>
+
+        <!-- Profile Picture on the Right -->
+         
+        <div class="col-4 text-end">
+          {% if current_user.profile_pic %}
+          <img src="{{url_for('static', filename='images/'+current_user.profile_pic)}}" width="210" class="img-fluid rounded">
+          <br>
+          {% else %}
+          <img src="{{url_for('static', filename='images/default_profile_pic.png')}}" width="210" class="img-fluid rounded">
+          {% endif %}
+        </div>
+      </div>
+    </div>
   </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Username: {{current_user.username}}</li>
-    <li class="list-group-item">Email: {{current_user.email}}</li>
-    <li class="list-group-item">Date Joined:{{current_user.date_added}}</li>
-  </ul>
-  <div class="card-body">
-    <a href="{{url_for('author.delete',id=current_user.id)}}" class='btn btn-outline-secondary ' >Delete</a>
-<a href="{{url_for('author.logout')}}" class='btn btn-outline-secondary' >Logout</a>
+
+  <br>
+
+  <div class="card">
+    <div class="card-header">Update Profile</div>
+    <div class="card-body">
+      <form action="/dashboard" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control", value=name_to_update.name) }}
+        <br>
+
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-control", value=name_to_update.username) }}
+        <br>
+
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control", value=name_to_update.email) }}
+        <br>
+
+        {{ form.bio.label(class="form-label") }}
+        <textarea name="bio" class="form-control">{{name_to_update.bio}}</textarea>
+        <br>
+
+        {{ form.profile_pic.label(class="form-label") }}
+        {{ form.profile_pic(class="form-control", value=name_to_update.profile_pic) }}
+        <br>
+
+        {{ form.submit(class="btn btn-outline-success") }}
+      </form>
+    </div>
   </div>
 </div>
-<br>
-<div class="card">
-  <div class="card-header">
-    Update Profile
-  </div>
-  <div class="card-body">
-
-    <form action ="/dashboard"  method="POST">
-      {{ form.hidden_tag() }}
-    
-      {{ form.name.label(class="form-label") }}
-      {{ form.name(class="form-control", value = name_to_update.name) }}
-      <br>
-      {{ form.username.label(class="form-label") }}
-      {{ form.username(class="form-control", value = name_to_update.username) }}
-      <br>
-      {{ form.email.label(class="form-label") }}
-      {{ form.email(class="form-control", value = name_to_update.email) }}
-      <br>
-      {{ form.bio.label(class="form-label") }}
-      <textarea name="bio" class="form-control">{{name_to_update.bio}}</textarea>
-      <br>
-      {{ form.submit(class="btn btn-outline-success") }}
-    
-    </form>
-
-  </div>
-</div>
-</div>
-
-
 {% endblock %}

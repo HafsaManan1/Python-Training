@@ -1,4 +1,3 @@
-from flask import current_app
 from flaskblog import db
 from flask_login import UserMixin
 from datetime import datetime, timezone, timedelta
@@ -15,6 +14,7 @@ class Users(db.Model, UserMixin):
     password_hash = db.Column(db.String(120))
     posts = db.relationship('Posts', backref = 'poster')
     comments = db.relationship('Comments', backref = 'commenter')
+    profile_pic = db.Column(db.String(), nullable = True)
 
     @property
     def password(self):

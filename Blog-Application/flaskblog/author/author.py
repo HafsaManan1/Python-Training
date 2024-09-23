@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, app
 from flaskblog import db, login_manager, mail
 from flaskblog.author.forms import NameForm, LoginForm, RestRequestForm, RestPasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,9 @@ from flaskblog.models import Users, PasswordResetToken
 from flask_mail import Message
 from datetime import datetime, timezone
 from flask_login import login_required, current_user, login_user, logout_user
+from werkzeug.utils import secure_filename
+from uuid import uuid1
+import os
 
 author = Blueprint("author",__name__)
 
@@ -84,21 +87,35 @@ def dashboard():
     id = current_user.id
     name_to_update =  Users.query.get_or_404(id)
     if request.method == "POST":
+        
         name_to_update.name = request.form['name']
         name_to_update.username = request.form['username']
         name_to_update.email = request.form['email']
         name_to_update.bio = request.form['bio']
-        try:
-            db.session.commit()
+        if request.files['profile_pic']:
+            name_to_update.profile_pic = request.files['profile_pic']
+            pic_filename = secure_filename(name_to_update.profile_pic.filename)
+            pic_name = str(uuid1())+"_"+pic_filename
+            upload_folder = os.path.join(current_app.root_path, 'static/images')
+            name_to_update.profile_pic.save(os.path.join(upload_folder, pic_name))
+            name_to_update.profile_pic = pic_name
+            try:
+                db.session.commit()
+                flash("User Updated Successfully!")
+                return render_template("dashboard.html", 
+                    form=form,
+                    name_to_update = name_to_update)
+            except:
+                flash("Error!  Looks like there was a problem...try again!")
+                return render_template("dashboard.html", 
+                    form=form,
+                    name_to_update = name_to_update)
+        else:
             flash("User Updated Successfully!")
             return render_template("dashboard.html", 
-				form=form,
-				name_to_update = name_to_update)
-        except:
-            flash("Error!  Looks like there was a problem...try again!")
-            return render_template("dashboard.html", 
-				form=form,
-				name_to_update = name_to_update)
+                    form=form,
+                    name_to_update = name_to_update)
+             
     else:
         return render_template("dashboard.html",form=form,name_to_update = name_to_update)
 
