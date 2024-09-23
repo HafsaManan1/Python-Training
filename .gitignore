@@ -4,3 +4,4 @@ __pycache__/
 venv/
 *.dtmp
 *.pdf
+Blog-Application/flaskblog/config.py/
