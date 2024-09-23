@@ -5,9 +5,9 @@ class Config:
     MAIL_PORT = 465
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
-    MAIL_USERNAME = 'hafsaamanan@gmail.com'
-    MAIL_PASSWORD = 'qtoopbopalzwannc'
-    MAIL_DEFAULT_SENDER = 'hafsaamanan@gmail.com'
+    MAIL_USERNAME = ''
+    MAIL_PASSWORD = ''
+    MAIL_DEFAULT_SENDER = ''
 
     #set private information in the form of environment variables
     #then do os.environ.get("name_of_the_variable")
