@@ -35,6 +35,19 @@
 </div>
 
 <h3>Comments</h3>
-{comments}
+{% for comment in comments %}
+{{comment.commenter.name}}<br>
+{{comment.content}}<br>
+{{comment.date_posted}}
+<br>
+<br><br>
+{% endfor %}
+
+{% if prev %}
+<a href="?number={{ prev }}">&laquo; Previous</a>
+{% endif %}
+{% if next %}
+<a href="?number={{ next }}">Next &raquo;</a>
+{% endif %}
 {% endblock %}
 

@@ -5,20 +5,30 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime, timezone, date
-import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.widgets import TextArea
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "any secret key"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USERNAME'] = 'hafsaamanan@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ybynjtaixkmdbmci'
+app.config['MAIL_DEFAULT_SENDER'] = 'hafsaamanan@gmail.com'
+mail = Mail(app)
 
 db = SQLAlchemy(app)
 migrate =  Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -105,15 +115,6 @@ def home_page():
 def hello(name):
     return f'Hello, {name}!'
 
-@app.route('/market')
-def market_page():
-    items = [
-    {'id': 1, 'name': 'Phone', 'barcode': '893212299897', 'price': 500},
-    {'id': 2, 'name': 'Laptop', 'barcode': '123985473165', 'price': 900},
-    {'id': 3, 'name': 'Keyboard', 'barcode': '231985128446', 'price': 150}
-]
-    return render_template('market.html', items=items)
-
 @app.route('/name', methods = ['GET','POST'])
 def name():
     name = None 
@@ -177,23 +178,6 @@ def delete(id):
     except:
         flash("Oops there was a problem deleting!!")
         return render_template("name.html", name = name, form = form, our_users = our_users)
-    
-# @app.route('/login', methods = ['GET','POST'])
-# def login():
-#     email = None 
-#     password = None
-#     pw_to_check = None
-#     passed = None
-#     form = PasswordForm()
-#     if form.validate_on_submit():
-#         email = form.email.data
-#         password = form.password_hash.data
-#         form.email.data = ''
-#         form.password_hash.data = ''
-#         pw_to_check = Users.query.filter_by(email=email).first()
-#         passed = check_password_hash(pw_to_check.password_hash, password)
-        
-#     return render_template("login.html", email = email, password = password, pw_to_check = pw_to_check, passed = passed, form = form)  
 
 @app.route('/add-post', methods = ['GET','POST'])
 def add_post():
@@ -213,7 +197,11 @@ def add_post():
 
 @app.route('/posts')
 def posts():
-    posts = Posts.query.order_by(Posts.date_posted)
+    page = request.args.get('page', 1, type=int)  # Get the page number from the URL query parameter, default to 1
+    posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=3)  # Paginate the query
+    # page = request.args.get('page', 1, type=int)
+    # posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=5)
+    # posts = Posts.query.order_by(Posts.date_posted)
     return render_template('posts.html',posts=posts)
 
 @app.route('/post/<int:id>',methods = ['GET','POST'])
@@ -224,15 +212,19 @@ def post(id):
         if not current_user.is_authenticated:
             flash("Please Login in order to comment")
             return redirect(url_for('login'))
-        poster = current_user.id
-        comment = Comments(content=form.content.data, commentor_id = poster, post_id = id)
+        #poster = current_user.id
+        email = post.poster.email
+        body = form.content.data
+        comment = Comments(content=form.content.data, commentor_id = current_user.id, post_id = id)
         form.content.data = ''
         db.session.add(comment)
         db.session.commit()
+        msg = Message('New Comment', recipients = [email],body = body)
+        mail.send(msg)
         flash("Comment added successfully")
         return redirect(url_for('post', id=id))
-    # comments = Comments.query.get_or_404(id)  
-    return render_template('post.html', post=post, form=form)
+    comments = Comments.query.filter_by(post_id=id).order_by(Comments.date_posted.desc()).all() 
+    return render_template('post.html', post=post, form=form,comments = comments)
 
 @app.route('/posts/edit/<int:id>', methods = ['GET','POST'])
 def edit_post(id):
@@ -329,6 +321,14 @@ def logout():
     logout_user()
     flash("You have logged out")
     return redirect(url_for('login'))
+
+# @app.route('/send-email', methods = ['GET', 'POST'])
+# def send_email():
+#     if request.method == 'POST':
+#         msg = Message('HEY', recipients = ['hafsaamanan@gmail.com'],body = "How are you?")
+#         mail.send(msg)
+#         return "SENT EMAIL"
+#     return render_template("send_email.html")
 
 @app.errorhandler(404)
 def page_not_found(e):
