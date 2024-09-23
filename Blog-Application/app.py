@@ -64,6 +64,10 @@ class CommentForm(FlaskForm):
     content = StringField("Content", validators=[DataRequired()], widget=TextArea())
     submit = SubmitField("Submit")
 
+class SearchForm(FlaskForm):
+    searched = StringField("Content", validators=[DataRequired()], widget=TextArea())
+    submit = SubmitField("Submit")
+
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), nullable = False,unique = True)
@@ -325,13 +329,21 @@ def logout():
     flash("You have logged out")
     return redirect(url_for('login'))
 
-# @app.route('/send-email', methods = ['GET', 'POST'])
-# def send_email():
-#     if request.method == 'POST':
-#         msg = Message('HEY', recipients = ['hafsaamanan@gmail.com'],body = "How are you?")
-#         mail.send(msg)
-#         return "SENT EMAIL"
-#     return render_template("send_email.html")
+@app.route('/search', methods = ["POST"])
+def search():
+    form = SearchForm()
+    posts = Posts.query
+    if form.validate_on_submit():
+        post.searched = form.searched.data
+        posts = posts.filter(Posts.content.like('%'+ post.searched + '%'))
+        posts = posts.order_by(Posts.title).all()
+        return render_template("search.html", form=form, searched = post.searched, posts = posts)
+
+    
+@app.context_processor
+def base():
+    form = SearchForm()
+    return dict(form = form)
 
 @app.errorhandler(404)
 def page_not_found(e):
