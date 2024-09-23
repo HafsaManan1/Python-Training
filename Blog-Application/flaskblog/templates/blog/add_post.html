@@ -1,5 +1,6 @@
-{% extends 'base.html'%}
+{% extends 'main/base.html'%}
 {% block content %}
+<!-- Toast container with fixed positioning -->
 <div class="toast-container position-fixed top-1 end-0 p-3">
   {% for message in get_flashed_messages(with_categories=true) %}
   <div class="toast align-items-center text-white {{ 'bg-success' if message[0] == 'success' else '' }}
@@ -18,25 +19,25 @@
   </div>
   {% endfor %}
 </div>
+
+<br>
 <div class="container my-4">
-  <form method="POST">
-    {{ form.hidden_tag() }}
+<form action="{{ url_for('blog.add_post')}}" method="POST">
+  {{ form.hidden_tag() }}
+
+  {{ form.title.label(class="form-label") }}<span style="color: red;">*</span>
+  {{ form.title(class="form-control") }}
+  <br>
+  {{ form.content.label(class="form-label") }}<span style="color: red;">*</span>
+  {{ form.content(class="form-control", rows = "5") }}
+  <br>
   
-    {{ form.title.label(class="form-label") }}
-    {{ form.title(class="form-control") }}
-    <br>
-    {{ form.content.label(class="form-label") }}
-    {{ form.content(class="form-control", rows = "5") }}
-    <br>
-    
-    {{ form.submit(class="btn btn-outline-success") }}
-  
-  </form>
-  {{ckeditor.load()}}
-  {{ckeditor.config(name='content')}}
-  </div>
-  
-<a href="{{ url_for('blog.posts')}}" class='btn btn-outline-secondary'>Back to Blogs</a>
+  {{ form.submit(class="btn btn-outline-primary") }}
+
+</form>
+{{ckeditor.load()}}
+{{ckeditor.config(name='content')}}
+</div>
 
 
 <script>

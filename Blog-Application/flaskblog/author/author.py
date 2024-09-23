@@ -16,47 +16,25 @@ author = Blueprint("author",__name__)
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
-@author.route('/name', methods = ['GET','POST'])
-def name():
-    name = None 
-    form = NameForm()
-    if form.validate_on_submit():
-        user = Users.query.filter_by(email = form.email.data).first()
-        if user is None:
-            hashed_pw = generate_password_hash(form.password_hash.data)
-            user = Users(username = form.username.data, name=form.name.data, email=form.email.data, bio = form.bio.data, password_hash = hashed_pw)
-            db.session.add(user)
-            db.session.commit()
-        name = form.name.data
-        form.name.data = ''
-        form.username.data = ''
-        form.email.data = ''
-        form.bio.data = ''
-        form.password_hash.data = ''
-        flash("User registered successfully","success")
-        return redirect(url_for('author.login'))
-    our_users = Users.query.order_by(Users.date_added)
-    return render_template("name.html", name = name, form = form, our_users = our_users)
-    
 @author.route('/delete/<int:id>')
 def delete(id):
-    name  = None
     form = NameForm()
     user_to_delete = Users.query.get_or_404(id)
 
     try:
         db.session.delete(user_to_delete)
         db.session.commit()
-        flash("User Deleted successfully","success")
+        flash("User Deleted successfully", "success")
         return redirect(url_for("author.login"))
     except:
-        flash("There was an error deleting the user","error")
+        flash("There was an error deleting the user", "error")
+        return redirect(url_for("author.login"))  # Add this return statement
 
 @author.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     form = NameForm()
-    return render_template("dashboard.html",form=form)
+    return render_template("author/dashboard.html",form=form)
 
 @author.route('/user-login', methods = ['GET', 'POST'])
 def login():
@@ -72,7 +50,7 @@ def login():
                 flash("Wrong Password","error")
         else:
             flash("This user does not exist","error")
-    return render_template('user_login.html', form = form)
+    return render_template('author/user_login.html', form = form)
 
 @author.route('/logout', methods = ['GET', 'POST'])
 @login_required
@@ -104,7 +82,7 @@ def reset_request():
         else:
             flash('No account with that email address exists.', 'warning')
         return redirect(url_for('author.login'))
-    return render_template('reset_request.html', form=form)
+    return render_template('author/reset_request.html', form=form)
 
 @author.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password_token(token):
@@ -122,7 +100,7 @@ def reset_password_token(token):
         db.session.commit()
         flash('Your password has been updated!', 'success')
         return redirect(url_for('author.login'))
-    return render_template('reset_password.html', form=form)
+    return render_template('author/reset_password.html', form=form)
 
 @author.route('/update/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -152,7 +130,46 @@ def update(id):
         except:
             db.session.rollback()
             flash("There was a problem in updating the user", "danger")
-            return render_template("update.html", form=form, name_to_update=name_to_update)
+            return render_template("author/update.html", form=form, name_to_update=name_to_update)
     
-    return render_template("update.html", form=form, name_to_update=name_to_update)
+    return render_template("author/update.html", form=form, name_to_update=name_to_update)
+
+@author.route('/name', methods=['GET', 'POST'])
+def name():
+    name = None 
+    form = NameForm()
+    if form.validate_on_submit():
+        user_by_email = Users.query.filter_by(email=form.email.data).first()
+        user_by_username = Users.query.filter_by(username=form.username.data).first()
+        if user_by_email and user_by_username:
+            flash("This username and email has already been used", "error")
+            return render_template("author/name.html", name=name, form=form)
+
+        elif user_by_username:
+            flash("This username isn't available.", "error")
+            return render_template("author/name.html", name=name, form=form)
+        
+        elif user_by_email:
+            flash("An account already exists with this email address.", "error")
+            return render_template("author/name.html", name=name, form=form)
+        
+        else:
+            hashed_pw = generate_password_hash(form.password_hash.data)
+            user = Users(username=form.username.data, name=form.name.data, email=form.email.data, bio=form.bio.data, password_hash=hashed_pw)
+            db.session.add(user)
+            db.session.commit()
+            name = form.name.data
+            form.name.data = ''
+            form.username.data = ''
+            form.email.data = ''
+            form.bio.data = ''
+            form.password_hash.data = ''
+            flash("User registered successfully", "success")
+            return redirect(url_for('author.login'))
+    
+    our_users = Users.query.order_by(Users.date_added)
+    return render_template("author/name.html", name=name, form=form, our_users=our_users)
+
+
+
 

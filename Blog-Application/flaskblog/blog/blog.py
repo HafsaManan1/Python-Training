@@ -23,13 +23,13 @@ def add_post():
         flash("Blog submitted successfully","success")
         return redirect(url_for('blog.posts'))
 
-    return render_template('add_post.html', form = form)
+    return render_template('blog/add_post.html', form = form)
 
 @blog.route('/posts')
 def posts():
     page = request.args.get('page', 1, type=int)
     posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=6)
-    return render_template('posts.html',posts=posts)
+    return render_template('blog/posts.html',posts=posts)
 
 @blog.route('/post/<int:id>',methods = ['GET','POST'])
 def post(id):
@@ -58,7 +58,7 @@ def post(id):
         flash("Comment added successfully", "success")
         return redirect(url_for('blog.post', id=id))
     comments = Comments.query.filter_by(post_id=id).order_by(Comments.date_posted.desc()).all() 
-    return render_template('post.html', post=post, form=form,comments = comments)
+    return render_template('blog/post.html', post=post, form=form,comments = comments)
 
 @blog.route('/posts/edit/<int:id>', methods = ['GET','POST'])
 def edit_post(id):
@@ -74,11 +74,11 @@ def edit_post(id):
     if current_user.id == post.poster_id:
         form.title.data = post.title
         form.content.data = post.content
-        return render_template('edit_post.html', form = form)
+        return render_template('blog/edit_post.html', form = form)
     else:
         flash("You arent authorized to edit this post", "warning")
         posts = Posts.query.order_by(Posts.date_posted)
-        return render_template('edit_post.html', form=form)
+        return render_template('blog/edit_post.html', form=form)
 
 @blog.route('/posts/delete/<int:id>')
 @login_required
@@ -92,18 +92,18 @@ def delete_post(id):
             flash("Post deleted successfully","success")
             page = request.args.get('page', 1, type=int)
             posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=6)
-            return render_template('posts.html',posts=posts)
+            return render_template('blog/posts.html',posts=posts)
 
         except:
             flash("There was a problem in deleting the post","error")
             page = request.args.get('page', 1, type=int)
             posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=6)
-            return render_template('posts.html',posts=posts)
+            return render_template('blog/posts.html',posts=posts)
     else:
         flash("You arent authorized to delete that post","warning")
         page = request.args.get('page', 1, type=int)
         posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=6)
-        return render_template('posts.html',posts=posts)
+        return render_template('blog/posts.html',posts=posts)
     
 @blog.context_processor
 def base():
@@ -117,7 +117,7 @@ def search():
         search_term = form.searched.data.strip() 
         if search_term:
             posts = Posts.query.filter(Posts.content.like(f'%{search_term}%')).order_by(Posts.title).all()
-            return render_template("search.html", form=form, searched=search_term, posts=posts)
+            return render_template("blog/search.html", form=form, searched=search_term, posts=posts)
         else:
             flash("Please enter a search term","warning")
             return redirect(url_for('blog.posts'))

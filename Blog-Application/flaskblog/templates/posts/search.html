@@ -1,8 +1,0 @@
-{% extends 'base.html' %}
-{% block content %}
-{% for post in posts %}
-<a href="{{url_for('blog.post', id = post.id)}}">
-{{post.title}}<br></a>
-{% endfor %}
-
-{% endblock%}

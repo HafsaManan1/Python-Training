@@ -7,4 +7,4 @@ main = Blueprint("main", __name__)
 @main.route('/home')
 def home_page():
     form = SearchForm()
-    return render_template('home.html', form=form)
+    return render_template('main/home.html', form=form)

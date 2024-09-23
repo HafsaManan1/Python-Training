@@ -1,42 +1,60 @@
-{% extends 'base.html'%}
+{% extends 'main/base.html'%}
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  {{message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
+<div class="toast-container position-fixed top-1 end-0 p-3">
+  {% for message in get_flashed_messages(with_categories=true) %}
+  <div class="toast align-items-center text-white {{ 'bg-success' if message[0] == 'success' else '' }}
+               {{ 'bg-danger' if message[0] == 'error' else '' }}
+               {{ 'bg-warning' if message[0] == 'warning' else '' }}
+               {{ 'bg-info' if message[0] == 'info' else '' }}
+               border-0 fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true"
+      data-bs-delay="5000">
+      <div class="d-flex">
+          <div class="toast-body">
+              {{ message[1] }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+              aria-label="Close"></button>
+      </div>
+  </div>
+  {% endfor %}
 </div>
-{% endfor %}
+
 <div class="container my-4">
-<h1>Update User</h1>
+  <h3>Update Profile</h3>
 <br>
-{% if name_to_update.id == current_user.id%}
-<form action ="/update/{{name_to_update.id}}"  method="POST">
+<form action="/update/{{name_to_update.id}}" method="POST" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
-  {{ form.name.label(class="form-label") }}
-  {{ form.name(class="form-control", value = name_to_update.name) }}
+  {{ form.name.label(class="form-label") }}<span style="color: red;">*</span>
+  {{ form.name(class="form-control", value=name_to_update.name) }}
   <br>
-  {{ form.username.label(class="form-label") }}
-  {{ form.username(class="form-control", value = name_to_update.username) }}
+
+  {{ form.username.label(class="form-label") }}<span style="color: red;">*</span>
+  {{ form.username(class="form-control", value=name_to_update.username) }}
   <br>
-  {{ form.email.label(class="form-label") }}
-  {{ form.email(class="form-control", value = name_to_update.email) }}
+
+  {{ form.email.label(class="form-label") }}<span style="color: red;">*</span>
+  {{ form.email(class="form-control", value=name_to_update.email) }}
   <br>
+
   {{ form.bio.label(class="form-label") }}
-  {{ form.bio(class="form-control", value = name_to_update.bio) }}
+  <textarea name="bio" class="form-control">{{name_to_update.bio}}</textarea>
   <br>
-  {{ form.submit(class="btn btn-secondary") }}
 
+  {{ form.profile_pic.label(class="form-label") }}
+  {{ form.profile_pic(class="form-control") }}
+  <br>
+
+  {{ form.submit(class="btn btn-outline-primary") }}
 </form>
-
-<br><br><br>
-{% else %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  You dont have the permission to edit this page!!
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
 </div>
-{% endif %}
-</div>
+<script>
+  // Initialize and show the toasts with smooth animation and auto-dismiss after 5 seconds
+  var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function (toastEl) {
+        var toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+        toast.show();  // Show the toast with fade-in effect
+        return toast;
+    });
+</script>
 {% endblock %}
