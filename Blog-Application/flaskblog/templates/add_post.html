@@ -25,6 +25,8 @@
   {{ form.submit(class="btn btn-outline-success") }}
 
 </form>
+{{ckeditor.load()}}
+{{ckeditor.config(name='content')}}
 </div>
 
 {% endblock %}

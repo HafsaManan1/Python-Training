@@ -1,14 +1,16 @@
+from flask import current_app
 from flaskblog import db
 from flask_login import UserMixin
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), nullable = False,unique = True)
     name = db.Column(db.String(200), nullable = False)
     email = db.Column(db.String(120), nullable = False,unique = True)
-    fav_color = db.Column(db.String(120))
+    bio = db.Column(db.Text(200), nullable = True)
     date_added = db.Column(db.DateTime, default = datetime.now(timezone.utc))
     password_hash = db.Column(db.String(120))
     posts = db.relationship('Posts', backref = 'poster')
@@ -43,3 +45,20 @@ class Comments(db.Model):
     date_posted = db.Column(db.DateTime, default = datetime.now(timezone.utc))
     commentor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+class PasswordResetToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(100), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    expiration_date = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('Users', backref='reset_tokens')
+
+    @staticmethod
+    def generate_token(user):
+        token = secrets.token_urlsafe()
+        expiration_date = datetime.now(timezone.utc) + timedelta(hours=1)
+        reset_token = PasswordResetToken(token=token, user=user, expiration_date=expiration_date)
+        db.session.add(reset_token)
+        db.session.commit()
+        return token

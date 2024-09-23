@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flaskblog import db, mail
+from flaskblog import db, mail, ckeditor
 from flaskblog.blog.forms import CommentForm, PostForm, SearchForm
 from flaskblog.models import Comments, Posts
 from flask_login import login_required, current_user

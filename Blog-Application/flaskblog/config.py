@@ -6,7 +6,7 @@ class Config:
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
     MAIL_USERNAME = 'hafsaamanan@gmail.com'
-    MAIL_PASSWORD = 'ybnshqivxejlwethif'
+    MAIL_PASSWORD = 'qtoopbopalzwannc'
     MAIL_DEFAULT_SENDER = 'hafsaamanan@gmail.com'
 
     #set private information in the form of environment variables

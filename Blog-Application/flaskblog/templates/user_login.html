@@ -8,7 +8,6 @@
 </div>
 {% endfor %}
 
-
 <br>
 <div class="container my-4">
 <form method="POST">
@@ -20,7 +19,9 @@
   {{ form.password.label(class="form-label") }}
   {{ form.password(class="form-control") }}
   <br>
-  {{ form.submit(class="btn btn-outline-success") }}
+  {{ form.submit(class="btn btn-outline-success") }} <br>
+  <a href="{{url_for('author.reset_request')}}">Forget password?</a><br>
+  <a href="{{url_for('author.name')}}">New to User? Sign Up!</a>
 
 </form>
 </div>

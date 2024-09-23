@@ -16,7 +16,7 @@ User Profile
 <div class="card">
   <div class="card-body">
     <h5 class="card-title">{{current_user.name}}</h5>
-    <p class="card-text">{{current_user.fav_color}}</p>
+    <p class="card-text">{{current_user.bio}}</p>
   </div>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">Username: {{current_user.username}}</li>
@@ -25,7 +25,6 @@ User Profile
   </ul>
   <div class="card-body">
     <a href="{{url_for('author.delete',id=current_user.id)}}" class='btn btn-outline-secondary ' >Delete</a>
-    <!-- <a href="{{url_for('update',id=current_user.id)}}" class='btn btn-outline-secondary' >Update</a> -->
 <a href="{{url_for('author.logout')}}" class='btn btn-outline-secondary' >Logout</a>
   </div>
 </div>
@@ -48,8 +47,8 @@ User Profile
       {{ form.email.label(class="form-label") }}
       {{ form.email(class="form-control", value = name_to_update.email) }}
       <br>
-      {{ form.fav_color.label(class="form-label") }}
-      {{ form.fav_color(class="form-control", value = name_to_update.fav_color) }}
+      {{ form.bio.label(class="form-label") }}
+      {{ form.bio(class="form-control", value = name_to_update.bio) }}
       <br>
       {{ form.submit(class="btn btn-outline-success") }}
     

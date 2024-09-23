@@ -28,9 +28,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('author.login')}}">User Login</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('author.name')}}">Register</a>
-                </li>
+                </li> -->
                 {% endif %}
             </ul>
             <form method='POST' action="{{url_for('blog.search')}}" class="d-flex" role="search">

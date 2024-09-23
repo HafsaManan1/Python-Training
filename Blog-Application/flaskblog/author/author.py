@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flaskblog import db, login_manager
-from flaskblog.author.forms import NameForm, LoginForm
+from flaskblog import db, login_manager, mail
+from flaskblog.author.forms import NameForm, LoginForm, RestRequestForm, RestPasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
-from flaskblog.models import Users, Comments, Posts
+from flaskblog.models import Users, PasswordResetToken
+from flask_mail import Message
+from datetime import datetime, timezone
 from flask_login import login_required, current_user, login_user, logout_user
 
 author = Blueprint("author",__name__)
@@ -19,14 +21,14 @@ def name():
         user = Users.query.filter_by(email = form.email.data).first()
         if user is None:
             hashed_pw = generate_password_hash(form.password_hash.data)
-            user = Users(username = form.username.data, name=form.name.data, email=form.email.data, fav_color = form.fav_color.data, password_hash = hashed_pw)
+            user = Users(username = form.username.data, name=form.name.data, email=form.email.data, bio = form.bio.data, password_hash = hashed_pw)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
         form.username.data = ''
         form.email.data = ''
-        form.fav_color.data = ''
+        form.bio.data = ''
         form.password_hash.data = ''
         flash("Form submitted successfully")
     our_users = Users.query.order_by(Users.date_added)
@@ -41,7 +43,7 @@ def update(id):
 		name_to_update.name = request.form['name']
 		name_to_update.username = request.form['username']
 		name_to_update.email = request.form['email']
-		name_to_update.fav_color = request.form['fav_color']
+		name_to_update.bio = request.form['bio']
 		try:
 			db.session.commit()
 			flash("User Updated Successfully!")
@@ -85,7 +87,7 @@ def dashboard():
         name_to_update.name = request.form['name']
         name_to_update.username = request.form['username']
         name_to_update.email = request.form['email']
-        name_to_update.fav_color = request.form['fav_color']
+        name_to_update.bio = request.form['bio']
         try:
             db.session.commit()
             flash("User Updated Successfully!")
@@ -122,3 +124,57 @@ def logout():
     logout_user()
     flash("You have logged out")
     return redirect(url_for('author.login'))
+
+# @author.route('/reset_password', methods = ['GET', 'POST'])
+# def reset_request():
+#     form = RestRequestForm()
+#     if form.validate_on_submit():
+#         user = Users.query.filter_by(email = form.email.data).first()
+#         if user:
+#             flash("Reset request send check your email")
+#             return redirect(url_for('author.login'))
+         
+#     return render_template('reset_request.html', form=form)
+
+@author.route('/reset_password', methods=['GET', 'POST'])
+def reset_request():
+    form = RestRequestForm()
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user:
+            token = PasswordResetToken.generate_token(user)
+            msg = Message('Password Reset Request',
+                          sender='noreply@demo.com',
+                          recipients=[user.email])
+            msg.body = f'''To reset your password, visit the following link:
+            
+{url_for('author.reset_password_token', token=token, _external=True)}
+
+If you did not make this request, simply ignore this email and no changes will be made.
+
+Regards,
+Your Flask App'''
+            mail.send(msg)
+            flash('An email with instructions to reset your password has been sent.', 'info')
+        else:
+            flash('No account with that email address exists.', 'warning')
+        return redirect(url_for('author.login'))
+    return render_template('reset_request.html', form=form)
+
+@author.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password_token(token):
+    reset_token = PasswordResetToken.query.filter_by(token=token).first_or_404()
+    if reset_token.expiration_date.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        flash('The reset token has expired.', 'warning')
+        return redirect(url_for('author.reset_request'))
+
+    form = RestPasswordForm()
+    if form.validate_on_submit():
+        user = reset_token.user
+        user.password = form.password.data
+        db.session.commit()
+        db.session.delete(reset_token)  # Remove the token once used
+        db.session.commit()
+        flash('Your password has been updated!', 'success')
+        return redirect(url_for('author.login'))
+    return render_template('reset_password.html', form=form)

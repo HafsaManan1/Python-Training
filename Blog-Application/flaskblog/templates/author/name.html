@@ -27,8 +27,8 @@
   {{ form.email.label(class="form-label") }}
   {{ form.email(class="form-control") }}
   <br>
-  {{ form.fav_color.label(class="form-label") }}
-  {{ form.fav_color(class="form-control") }}
+  {{ form.bio.label(class="form-label") }}
+  {{ form.bio(class="form-control") }}
   <br>
   {{ form.password_hash.label(class="form-label") }}
   {{ form.password_hash(class="form-control") }}
@@ -43,10 +43,6 @@
 
 <br><br><br>
 
-<!-- {% for our_user in our_users %}
-{{our_user.id}}. <a href="{{url_for('update',id=our_user.id)}}"> {{our_user.name}}</a> {{our_user.username}} - {{our_user.email}} - {{our_user.fav_color}} <a href="{{url_for('delete',id=our_user.id)}}"> Delete</a>
-<br>
-{% endfor %} -->
 
 {% endif %}
 
