@@ -13,7 +13,7 @@ migrate = Migrate()
 ckeditor = CKEditor()
 
 login_manager = LoginManager()
-login_manager.login_view = 'login'
+login_manager.login_view = 'author.login'
 
 def create_app(config_class = Config):
     # Create app instance

@@ -1,42 +1,70 @@
-<!-- {% extends 'base.html'%}
+{% extends 'base.html' %}
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  {{message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-  </button>
-</div>
-{% endfor %}
 
-<br>
-<div class="container my-4">
-<form method="POST">
-  <h1>Reset password</h1>
-  {{ form.hidden_tag() }}
-  {{ form.email.label(class="form-label") }}
-  {{ form.email(class="form-control") }}
-  <br>
-  {{ form.submit(class="btn btn-outline-success") }} <br>
-</form>
+<!-- Toast container with fixed positioning -->
+<div class="toast-container position-fixed top-1 end-0 p-3">
+    {% for message in get_flashed_messages(with_categories=true) %}
+    <div class="toast align-items-center text-white {{ 'bg-success' if message[0] == 'success' else '' }}
+                 {{ 'bg-danger' if message[0] == 'error' else '' }}
+                 {{ 'bg-warning' if message[0] == 'warning' else '' }}
+                 {{ 'bg-info' if message[0] == 'info' else '' }}
+                 border-0 fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true"
+        data-bs-delay="5000">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ message[1] }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
-{% endblock %} -->
-<!doctype html>
-<html>
-<head>
-    <title>Reset Password</title>
-</head>
-<body>
-    <h1>Reset Password</h1>
-    <form method="post">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.email.label }}
-            {{ form.email() }}
+<!-- Form Container -->
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="row w-100">
+        <div class="col-md-6 col-lg-4 mx-auto">
+            <div class="card p-4">
+              
+                <h4 class="card-title text-center mb-4">Reset Password</h4>
+                <p class="text-center mb-3">
+                    Trouble with logging in?<br>
+                    Enter your email address, and we'll send you a link to get back into your account.
+                </p>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Email address</label><span style="color: red;">*</span>
+                        {{ form.email(class="form-control", placeholder="Email address", id="emailInput") }}
+                        {% if form.email.errors %}
+                        <div class="text-danger" style="font-size: 12px;">
+                            {% for error in form.email.errors %}
+                            <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.submit(class="btn btn-primary w-100") }}
+                    </div>
+                </form>
+                <p class="text-center">OR <br> <br>
+                    <a href="{{ url_for('author.login') }}" class="btn btn-light border w-100">Back to Login</a>
+                </p>
+            </div>
         </div>
-        <div>
-            {{ form.submit() }}
-        </div>
-    </form>
-</body>
-</html>
+    </div>
+</div>
+
+<script>
+    // Initialize and show the toasts with smooth animation and auto-dismiss after 5 seconds
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function (toastEl) {
+        var toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+        toast.show();  // Show the toast with fade-in effect
+        return toast;
+    });
+</script>
+
+{% endblock %}

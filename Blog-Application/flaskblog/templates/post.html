@@ -1,54 +1,87 @@
 {% extends 'base.html'%}
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  {{message}}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-  </button>
+<!-- Toast container with fixed positioning -->
+<div class="toast-container">
+  {% for message in get_flashed_messages(with_categories=true) %}
+  <div class="toast align-items-center text-white {{ 'bg-success' if message[0] == 'success' else '' }}
+               {{ 'bg-danger' if message[0] == 'error' else '' }}
+               {{ 'bg-warning' if message[0] == 'warning' else '' }}
+               {{ 'bg-info' if message[0] == 'info' else '' }}
+               border-0 fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true"
+      data-bs-delay="5000">
+      <div class="d-flex">
+          <div class="toast-body">
+              {{ message[1] }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+              aria-label="Close"></button>
+      </div>
+  </div>
+  {% endfor %}
 </div>
-{% endfor %}
+
+
 <div class="container my-4">
-<div class="shadow p-3 mb-5 bg-body rounded">
-{{post.title}}
-{{post.id}}
-{{post.poster.name}}
-{{post.date_posted}}
-{{post.content|safe}}
-<br><br>
+  <div class="shadow p-3 mb-5 bg-body rounded">
+      <h1>{{ post.title }}</h1>
+      Blog by: {{ post.poster.username }}<br>
+      Published on: {{ post.date_posted.date() }}<br>
+      <br>
+      <!-- Content with responsive images -->
+      <div class="content">
+          {{ post.content|safe }}
+      </div>
+      <br>
+  </div>
+  <a href="{{ url_for('blog.posts') }}" class='btn btn-outline-secondary'>Back to Blogs</a>
+  {% if post.poster_id == current_user.id %}
+      <a href="{{ url_for('blog.edit_post', id=post.id) }}" class='btn btn-outline-secondary'>Edit Post</a>
+      <a href="{{ url_for('blog.delete_post', id=post.id) }}" class='btn btn-outline-danger'>Delete Post</a>
+  {% endif %}
 </div>
-<a href="{{ url_for('blog.posts')}}" class='btn btn-outline-secondary'>Back to Blogs</a>
-{% if post.poster_id == current_user.id%}
-<a href="{{url_for('blog.edit_post',id = post.id)}}" class='btn btn-outline-secondary'>Edit Post</a> 
-<a href="{{url_for('blog.delete_post',id = post.id)}}" class='btn btn-outline-danger'>Delete Post</a> 
 
-{% endif %}
+<!-- Add custom CSS for responsive images -->
+<style>
+  .content img {
+      max-width: 100%;
+      height: auto;
+  }
+</style>
+<div class="container my-4">
+  <!-- Comment Form -->
+  <h3 class="mb-4">Leave a Comment</h3>
 
-<h3>Comment</h3>
+  <form action="{{ url_for('blog.post', id=post.id) }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.content(class="form-control", rows="5", placeholder="Write your comment here...") }}
+    </div>
+    <div class="d-flex justify-content-end">
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
 
-<form action="{{ url_for('blog.post',id = post.id)}}" method="POST">
-  {{ form.hidden_tag() }}
-  {{ form.content(class="form-control", rows = "5") }}
-  <br>
+  <!-- Comments List -->
+  <h3 class="my-4">Comments</h3>
+  <div class="list-group">
+    {% for comment in comments %}
+    <div class="list-group-item mb-3">
+      <h5 class="mb-1">{{ comment.commenter.name }}</h5>
+      <p class="mb-1">{{ comment.content }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+</div>
+
+<script>
+  var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+  var toastList = toastElList.map(function (toastEl) {
+      var toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+      toast.show();  // Show the toast with fade-in effect
+      return toast;
+  });
+  </script>
   
-  {{ form.submit(class="btn btn-secondary") }}
-</form>
-
-
-<h3>Comments</h3>
-{% for comment in comments %}
-{{comment.commenter.name}}<br>
-{{comment.content}}<br>
-{{comment.date_posted}}
-<br>
-<br><br>
-{% endfor %}
-
-{% if prev %}
-<a href="?number={{ prev }}">&laquo; Previous</a>
-{% endif %}
-{% if next %}
-<a href="?number={{ next }}">Next &raquo;</a>
-{% endif %}
-</div>
 {% endblock %}
-

@@ -8,7 +8,6 @@ class PostForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
     content = CKEditorField("Content", validators=[DataRequired()])
     author = StringField("Author")
-    slug = StringField("Slug", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 class CommentForm(FlaskForm):
