@@ -8,32 +8,32 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="{{ url_for('home_page')}}">Home <span class="sr-only"></span></a>
+                    <a class="nav-link" href="{{ url_for('main.home_page')}}">Home <span class="sr-only"></span></a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('add_post')}}">Add Blog</a>
+                    <a class="nav-link" href="{{ url_for('blog.add_post')}}">Add Blog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('posts')}}">Blogs</a>
+                    <a class="nav-link" href="{{ url_for('blog.posts')}}">Blogs</a>
                 </li>
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
+                    <a class="nav-link" href="{{ url_for('author.logout')}}">Logout</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('dashboard')}}">Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('author.dashboard')}}">Dashboard</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('login')}}">User Login</a>
+                    <a class="nav-link" href="{{ url_for('author.login')}}">User Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('name')}}">Register</a>
+                    <a class="nav-link" href="{{ url_for('author.name')}}">Register</a>
                 </li>
                 {% endif %}
             </ul>
-            <form method='POST' action="{{url_for('search')}}" class="d-flex" role="search">
+            <form method='POST' action="{{url_for('blog.search')}}" class="d-flex" role="search">
                 {{ form.hidden_tag() }}
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" ,
                     name="searched">

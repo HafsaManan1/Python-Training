@@ -1,0 +1,61 @@
+{% extends 'base.html'%}
+{% block content %}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  {{message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+  </button>
+</div>
+{% endfor %}
+<div class="container my-4">
+<h3>
+User Profile
+</h3>
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">{{current_user.name}}</h5>
+    <p class="card-text">{{current_user.fav_color}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Username: {{current_user.username}}</li>
+    <li class="list-group-item">Email: {{current_user.email}}</li>
+    <li class="list-group-item">Date Joined:{{current_user.date_added}}</li>
+  </ul>
+  <div class="card-body">
+    <a href="{{url_for('author.delete',id=current_user.id)}}" class='btn btn-outline-secondary ' >Delete</a>
+<a href="{{url_for('author.logout')}}" class='btn btn-outline-secondary' >Logout</a>
+  </div>
+</div>
+<br>
+<div class="card">
+  <div class="card-header">
+    Update Profile
+  </div>
+  <div class="card-body">
+
+    <form action ="/dashboard"  method="POST">
+      {{ form.hidden_tag() }}
+    
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control", value = name_to_update.name) }}
+      <br>
+      {{ form.username.label(class="form-label") }}
+      {{ form.username(class="form-control", value = name_to_update.username) }}
+      <br>
+      {{ form.email.label(class="form-label") }}
+      {{ form.email(class="form-control", value = name_to_update.email) }}
+      <br>
+      {{ form.fav_color.label(class="form-label") }}
+      {{ form.fav_color(class="form-control", value = name_to_update.fav_color) }}
+      <br>
+      {{ form.submit(class="btn btn-outline-success") }}
+    
+    </form>
+
+  </div>
+</div>
+</div>
+
+
+{% endblock %}

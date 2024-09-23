@@ -10,7 +10,7 @@
 {% endfor %}
 <br>
 <div class="container my-4">
-<form action="{{ url_for('add_post')}}" method="POST">
+<form action="{{ url_for('blog.add_post')}}" method="POST">
   {{ form.hidden_tag() }}
 
   {{ form.title.label(class="form-label") }}
