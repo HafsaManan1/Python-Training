@@ -16,19 +16,19 @@ author = Blueprint("author",__name__)
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
-@author.route('/delete/<int:id>')
-def delete(id):
-    form = NameForm()
-    user_to_delete = Users.query.get_or_404(id)
+# @author.route('/delete/<int:id>')
+# def delete(id):
+#     form = NameForm()
+#     user_to_delete = Users.query.get_or_404(id)
 
-    try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        flash("User Deleted successfully", "success")
-        return redirect(url_for("author.login"))
-    except:
-        flash("There was an error deleting the user", "error")
-        return redirect(url_for("author.login"))  # Add this return statement
+#     try:
+#         db.session.delete(user_to_delete)
+#         db.session.commit()
+#         flash("User Deleted successfully", "success")
+#         return redirect(url_for("author.login"))
+#     except:
+#         flash("There was an error deleting the user", "error")
+#         return redirect(url_for("author.login"))  # Add this return statement
 
 @author.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -170,6 +170,18 @@ def name():
     our_users = Users.query.order_by(Users.date_added)
     return render_template("author/name.html", name=name, form=form, our_users=our_users)
 
+@author.route('/delete/<int:id>')
+def delete(id):
+    user_to_delete = Users.query.get_or_404(id)
 
+    try: 
+        # Delete the user, which will also delete associated posts and comments
+        db.session.delete(user_to_delete)
+        db.session.commit()
 
+        flash("User and associated data deleted successfully", "success")
+    except Exception as e:
+        db.session.rollback()  # Rollback any changes if an error occurs
+        flash("There was an error deleting the user: {}".format(e), "error")
 
+    return redirect(url_for("author.login"))  # Redirect to a safe page

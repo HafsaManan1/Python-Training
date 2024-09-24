@@ -12,8 +12,8 @@ class Users(db.Model, UserMixin):
     bio = db.Column(db.Text(200), nullable = True)
     date_added = db.Column(db.DateTime, default = datetime.now(timezone.utc))
     password_hash = db.Column(db.String(120))
-    posts = db.relationship('Posts', backref = 'poster')
-    comments = db.relationship('Comments', backref = 'commenter')
+    posts = db.relationship('Posts', backref = 'poster', cascade="all, delete-orphan")
+    comments = db.relationship('Comments', backref = 'commenter', cascade="all, delete-orphan")
     profile_pic = db.Column(db.String(), nullable = True)
 
     @property
@@ -36,7 +36,7 @@ class Posts(db.Model):
     content = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default = datetime.now(timezone.utc))
     poster_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    comments = db.relationship('Comments', backref='post')
+    comments = db.relationship('Comments', backref='post', cascade="all, delete-orphan")
 
 class Comments(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
